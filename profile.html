@@ -1,106 +1,211 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Biblios - Profil Pengguna</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-bg': '#FEFAF1', 'accent-dark': '#1D5C63', 'text-dark': '#333333', 'light-gray': '#EAEAEA',
-                    },
-                    fontFamily: { 'serif': ['Playfair Display', 'serif'], 'sans': ['Inter', 'sans-serif'], },
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "primary-bg": "#FEFAF1",
+              "accent-dark": "#1D5C63",
+              "text-dark": "#333333",
+              "light-gray": "#EAEAEA",
+            },
+            fontFamily: {
+              serif: ["Playfair Display", "serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-</head>
-<body class="font-sans bg-primary-bg text-text-dark leading-relaxed">
-
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="font-sans bg-primary-bg text-text-dark leading-relaxed">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <header class="flex justify-between items-center py-5">
-                <div class="font-serif text-3xl font-bold text-accent-dark">Biblios</div>
-                
-                <div class="flex items-center">
-                    <nav id="desktop-nav" class="hidden sm:flex text-sm font-semibold text-gray-700 space-x-4">
-                        <a href="index.html" class="mr-4 text-accent-dark font-bold"><i class="fas fa-book-open mr-1"></i> Library</a>
-                        <a href="statistik.html" class="mr-4 hover:text-accent-dark transition"><i class="fas fa-chart-bar mr-1"></i> Statistics</a>
-                        <a href="profile.html" class="hover:text-accent-dark transition"><i class="fas fa-user mr-1"></i> Profile</a>
-                    </nav>
-                    
-                    <button id="menu-button" class="text-2xl text-accent-dark sm:hidden ml-4">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </header>
-            
-            <div id="mobile-menu" class="hidden sm:hidden flex flex-col space-y-2 p-2 text-sm bg-white shadow-lg rounded-lg border border-light-gray absolute top-16 right-4 z-20 w-40">
-                <a href="index.html" class="py-1.5 px-2.5 text-white bg-accent-dark rounded-md font-semibold transition flex items-center">
-                    <i class="fas fa-book-open mr-2 w-3"></i> Library
-                </a>
-                <a href="statistik.html" class="py-1.5 px-2.5 hover:bg-light-gray rounded-md text-gray-700 transition flex items-center">
-                    <i class="fas fa-chart-bar mr-2 w-3"></i> Statistics
-                </a>
-                <a href="profile.html" class="py-1.5 px-2.5 hover:bg-light-gray rounded-md text-gray-700 transition flex items-center">
-                    <i class="fas fa-user mr-2 w-3"></i> Profile
-                </a>
-            </div>
-
-            <hr class="border-t border-light-gray mb-6 mt-0 sm:mt-0">
-        
-        <h1 class="font-serif text-2xl sm:text-3xl text-accent-dark mb-8">Pengaturan Akun dan Profil</h1>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            <div class="md:col-span-2 bg-white p-6 sm:p-8 rounded-lg shadow-lg">
-                <h2 class="font-serif text-xl sm:text-2xl text-accent-dark mb-4 border-b pb-2">Informasi Akun</h2>
-                
-                <div class="mb-4">
-                    <p class="text-sm text-gray-500">Nama Pengguna:</p>
-                    <p class="font-semibold text-base sm:text-lg">PembacaSetia_99</p>
-                </div>
-                
-                <div class="mb-4">
-                    <p class="text-sm text-gray-500">Email:</p>
-                    <p class="font-semibold text-base sm:text-lg">pembaca.setia@mail.com</p>
-                </div>
-
-                <button class="bg-gray-200 text-gray-700 py-2 px-4 rounded-md font-semibold hover:bg-gray-300 transition mt-4 text-sm sm:text-base">Ubah Kata Sandi</button>
-            </div>
-
-            <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg">
-                <h2 class="font-serif text-xl sm:text-2xl text-accent-dark mb-4 border-b pb-2">Pengaturan Lain</h2>
-                
-                <div class="flex justify-between items-center mb-4 text-sm sm:text-base">
-                    <p>Mode Gelap (Dark Mode)</p>
-                    <label class="switch relative inline-block w-12 h-6">
-                        <input type="checkbox" class="opacity-0 w-0 h-0" disabled>
-                        <span class="slider round absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition duration-400 before:absolute before:content-[''] before:h-5 before:w-5 before:left-0.5 before:bottom-0.5 before:bg-white before:rounded-full before:transition duration-400"></span>
-                    </label>
-                </div>
-                
-                <button class="text-red-600 border border-red-600 py-2 px-4 rounded-md font-semibold hover:bg-red-50 transition mt-4 text-sm sm:text-base">Keluar / Logout</button>
-            </div>
+      <header class="flex justify-between items-center py-4 px-4 sm:px-10">
+        <div class="font-serif text-3xl font-bold text-[#2F3E46] tracking-wide">
+          Biblios
         </div>
-    </div>
-    
-    <style>
-        :root {
-            --color-accent-dark: #1D5C63; /* Define CSS Variable for Switch */
-        }
-        .switch input:checked + .slider {
-            background-color: var(--color-accent-dark);
-        }
 
-        .switch input:checked + .slider:before {
-            transform: translateX(24px);
-        }
+        <div class="flex items-center">
+          <!-- Desktop Navbar -->
+          <nav
+            class="hidden sm:flex items-center text-sm font-semibold text-[#2F3E46] gap-8"
+          >
+            <a href="#" class="relative group flex items-center">
+              <i class="fas fa-home mr-1"></i> Home
+              <span
+                class="absolute bottom-0 left-0 w-0 group-hover:w-full h-[2px] bg-[#52796F] transition-all duration-300 rounded-full"
+              ></span>
+            </a>
+
+            <a
+              href="index.html"
+              class="relative group flex items-center font-bold"
+            >
+              <i class="fas fa-book-open mr-1"></i> My Library
+              <span
+                class="absolute bottom-0 left-0 w-0 group-hover:w-full h-[2px] bg-[#52796F] transition-all duration-300 rounded-full"
+              ></span>
+            </a>
+
+            <a href="statistik.html" class="relative group flex items-center">
+              <i class="fas fa-chart-bar mr-1"></i> Statistics
+              <span
+                class="absolute bottom-0 left-0 w-0 group-hover:w-full h-[2px] bg-[#52796F] transition-all duration-300 rounded-full"
+              ></span>
+            </a>
+
+            <a
+              href="profile.html"
+              class="relative group text-[#52796F] flex items-center"
+            >
+              <i class="fas fa-user mr-1"></i> Profile
+              <span
+                class="absolute bottom-0 left-0 w-full bg-[#52796F] h-[2px]"
+              ></span>
+            </a>
+          </nav>
+
+          <!-- Mobile Button -->
+          <button
+            id="menu-button"
+            class="text-3xl text-[#2F3E46] sm:hidden ml-4"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Mobile Menu Dropdown -->
+      <div
+        id="mobile-menu"
+        class="hidden sm:hidden flex flex-col space-y-2 p-4 bg-white shadow-xl rounded-xl border border-[#CAD2C5] absolute top-20 right-4 z-20 w-48"
+      >
+        <a
+          href="#"
+          class="py-2 px-3 hover:bg-[#F7F4EB] rounded-md flex items-center transition"
+        >
+          <i class="fas fa-home mr-2 w-3"></i> Home
+        </a>
+
+        <a
+          href="index.html"
+          class="py-2 px-3 hover:bg-[#F7F4EB] rounded-md flex items-center transition"
+        >
+          <i class="fas fa-book-open mr-2 w-3"></i> My Library
+        </a>
+
+        <a
+          href="statistik.html"
+          class="py-2 px-3 hover:bg-[#F7F4EB] rounded-md flex items-center transition"
+        >
+          <i class="fas fa-chart-bar mr-2 w-3"></i> Statistics
+        </a>
+
+        <a
+          href="profile.html"
+          class="py-2 px-3 bg-[#52796F] text-white rounded-md flex items-center transition"
+        >
+          <i class="fas fa-user mr-2 w-3"></i> Profile
+        </a>
+      </div>
+
+      <hr class="border-t border-light-gray mb-6 mt-0 sm:mt-0" />
+
+      <h1 class="font-serif text-2xl sm:text-3xl text-accent-dark mb-8">
+        Pengaturan Akun dan Profil
+      </h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="md:col-span-2 bg-white p-6 sm:p-8 rounded-lg shadow-lg">
+          <h2
+            class="font-serif text-xl sm:text-2xl text-accent-dark mb-4 border-b pb-2"
+          >
+            Informasi Akun
+          </h2>
+
+          <div class="mb-4">
+            <p class="text-sm text-gray-500">Nama Pengguna:</p>
+            <p class="font-semibold text-base sm:text-lg">PembacaSetia_99</p>
+          </div>
+
+          <div class="mb-4">
+            <p class="text-sm text-gray-500">Email:</p>
+            <p class="font-semibold text-base sm:text-lg">
+              pembaca.setia@mail.com
+            </p>
+          </div>
+
+          <button
+            class="bg-gray-200 text-gray-700 py-2 px-4 rounded-md font-semibold hover:bg-gray-300 transition mt-4 text-sm sm:text-base"
+          >
+            Ubah Kata Sandi
+          </button>
+        </div>
+
+        <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg">
+          <h2
+            class="font-serif text-xl sm:text-2xl text-accent-dark mb-4 border-b pb-2"
+          >
+            Pengaturan Lain
+          </h2>
+
+          <div
+            class="flex justify-between items-center mb-4 text-sm sm:text-base"
+          >
+            <p>Mode Gelap (Dark Mode)</p>
+            <label class="switch relative inline-block w-12 h-6">
+              <input type="checkbox" class="opacity-0 w-0 h-0" disabled />
+              <span
+                class="slider round absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition duration-400 before:absolute before:content-[''] before:h-5 before:w-5 before:left-0.5 before:bottom-0.5 before:bg-white before:rounded-full before:transition duration-400"
+              ></span>
+            </label>
+          </div>
+
+          <button
+            class="text-red-600 border border-red-600 py-2 px-4 rounded-md font-semibold hover:bg-red-50 transition mt-4 text-sm sm:text-base"
+          >
+            Keluar / Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Mobile Menu Elements
+      const menuButton = document.getElementById("menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      // Event listener untuk Mobile Menu (NEW)
+      menuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+    </script>
+
+    <style>
+      :root {
+        --color-accent-dark: #1d5c63; /* Define CSS Variable for Switch */
+      }
+      .switch input:checked + .slider {
+        background-color: var(--color-accent-dark);
+      }
+
+      .switch input:checked + .slider:before {
+        transform: translateX(24px);
+      }
     </style>
-</body>
+  </body>
 </html>
