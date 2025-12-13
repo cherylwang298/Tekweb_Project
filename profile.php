@@ -94,11 +94,11 @@ include 'navbar.php';
             </label>
           </div>
 
-          <button
+          <a href="logout.php"
             class="text-red-600 border border-red-600 py-2 px-4 rounded-md font-semibold hover:bg-red-50 transition mt-4 text-sm sm:text-base"
           >
             Keluar / Logout
-          </button>
+          </a>
         </div>
       </div>
     </div>
