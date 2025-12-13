@@ -67,6 +67,60 @@ $conn->close();
     .font-serif {
       font-family: "Playfair Display", serif;
     }
+
+    @keyframes blobMove1 {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      25% {
+        transform: translate(60px, -40px) scale(1.1);
+      }
+
+      50% {
+        transform: translate(-40px, 50px) scale(0.95);
+      }
+
+      75% {
+        transform: translate(50px, 30px) scale(1.05);
+      }
+
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    @keyframes blobMove2 {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      30% {
+        transform: translate(-70px, 40px) scale(1.15);
+      }
+
+      60% {
+        transform: translate(40px, -60px) scale(0.9);
+      }
+
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    @keyframes blobMove3 {
+      0% {
+        transform: translateY(0) scale(1);
+      }
+
+      50% {
+        transform: translateY(-80px) scale(1.1);
+      }
+
+      100% {
+        transform: translateY(0) scale(1);
+      }
+    }
   </style>
 </head>
 
@@ -93,14 +147,25 @@ $conn->close();
     }
   </script>
 
-  <div class="absolute top-0 left-0 w-56 h-56 sm:w-72 sm:h-72
-              bg-[#D9E4DD] rounded-full blur-3xl opacity-40 -z-10"></div>
+  <div
+    class="absolute top-0 left-0 w-60 h-60 sm:w-80 sm:h-80
+         bg-[#B7D1C3] rounded-full blur-3xl opacity-50 -z-10"
+    style="animation: blobMove1 20s ease-in-out infinite;">
+  </div>
 
-  <div class="absolute bottom-0 right-0 w-72 h-72 sm:w-96 sm:h-96
-              bg-[#CAD2C5] rounded-full blur-2xl opacity-40 -z-10"></div>
 
-  <div class="absolute top-1/3 right-6 sm:right-10 w-40 h-40 sm:w-52 sm:h-52
-              bg-[#84A98C] rounded-full blur-xl opacity-30 -z-10"></div>
+  <div
+    class="absolute bottom-0 right-0 w-72 h-72 sm:w-[22rem] sm:h-[22rem]
+         bg-[#84A98C] rounded-full blur-2xl opacity-45 -z-10"
+    style="animation: blobMove2 26s ease-in-out infinite;">
+  </div>
+
+
+  <div
+    class="absolute top-1/3 right-6 sm:right-16 w-44 h-44 sm:w-60 sm:h-60
+         bg-[#E9EDC9] rounded-full blur-xl opacity-40 -z-10"
+    style="animation: blobMove3 18s ease-in-out infinite;">
+  </div>
 
   <div
     class="w-full max-w-sm sm:max-w-lg bg-white rounded-3xl shadow-2xl
