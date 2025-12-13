@@ -21,7 +21,7 @@ if (isset($_POST['submit'])) {
         $_SESSION['username'] = $user['username'];
         $_SESSION['name']     = $user['name'];
 
-        header("Location: index.html");
+        header("Location: index.php");
         exit;
       } else {
         $error = "Password salah!";

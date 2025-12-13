@@ -1,3 +1,10 @@
+<?php
+session_start();
+include 'koneksi.php';
+include 'navbar.php';
+
+?>
+
 <!DOCTYPE html>
 <html lang="id">
   <head>
@@ -34,95 +41,7 @@
   </head>
   <body class="font-sans bg-primary-bg text-text-dark leading-relaxed">
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-      <header class="flex justify-between items-center py-4 px-4 sm:px-10">
-        <div class="font-serif text-3xl font-bold text-[#2F3E46] tracking-wide">
-          Biblios
-        </div>
-
-        <div class="flex items-center">
-          <!-- Desktop Navbar -->
-          <nav
-            class="hidden sm:flex items-center text-sm font-semibold text-[#2F3E46] gap-8"
-          >
-            <a href="#" class="relative group flex items-center">
-              <i class="fas fa-home mr-1"></i> Home
-              <span
-                class="absolute bottom-0 left-0 w-0 group-hover:w-full h-[2px] bg-[#52796F] transition-all duration-300 rounded-full"
-              ></span>
-            </a>
-
-            <a
-              href="index.html"
-              class="relative group flex items-center font-bold"
-            >
-              <i class="fas fa-book-open mr-1"></i> My Library
-              <span
-                class="absolute bottom-0 left-0 w-0 group-hover:w-full h-[2px] bg-[#52796F] transition-all duration-300 rounded-full"
-              ></span>
-            </a>
-
-            <a href="statistik.html" class="relative group flex items-center">
-              <i class="fas fa-chart-bar mr-1"></i> Statistics
-              <span
-                class="absolute bottom-0 left-0 w-0 group-hover:w-full h-[2px] bg-[#52796F] transition-all duration-300 rounded-full"
-              ></span>
-            </a>
-
-            <a
-              href="profile.html"
-              class="relative group text-[#52796F] flex items-center"
-            >
-              <i class="fas fa-user mr-1"></i> Profile
-              <span
-                class="absolute bottom-0 left-0 w-full bg-[#52796F] h-[2px]"
-              ></span>
-            </a>
-          </nav>
-
-          <!-- Mobile Button -->
-          <button
-            id="menu-button"
-            class="text-3xl text-[#2F3E46] sm:hidden ml-4"
-          >
-            <i class="fas fa-bars"></i>
-          </button>
-        </div>
-      </header>
-
-      <!-- Mobile Menu Dropdown -->
-      <div
-        id="mobile-menu"
-        class="hidden sm:hidden flex flex-col space-y-2 p-4 bg-white shadow-xl rounded-xl border border-[#CAD2C5] absolute top-20 right-4 z-20 w-48"
-      >
-        <a
-          href="#"
-          class="py-2 px-3 hover:bg-[#F7F4EB] rounded-md flex items-center transition"
-        >
-          <i class="fas fa-home mr-2 w-3"></i> Home
-        </a>
-
-        <a
-          href="index.html"
-          class="py-2 px-3 hover:bg-[#F7F4EB] rounded-md flex items-center transition"
-        >
-          <i class="fas fa-book-open mr-2 w-3"></i> My Library
-        </a>
-
-        <a
-          href="statistik.html"
-          class="py-2 px-3 hover:bg-[#F7F4EB] rounded-md flex items-center transition"
-        >
-          <i class="fas fa-chart-bar mr-2 w-3"></i> Statistics
-        </a>
-
-        <a
-          href="profile.html"
-          class="py-2 px-3 bg-[#52796F] text-white rounded-md flex items-center transition"
-        >
-          <i class="fas fa-user mr-2 w-3"></i> Profile
-        </a>
-      </div>
-
+      
       <hr class="border-t border-light-gray mb-6 mt-0 sm:mt-0" />
 
       <h1 class="font-serif text-2xl sm:text-3xl text-accent-dark mb-8">
