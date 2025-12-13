@@ -71,95 +71,128 @@ $conn->close();
 </head>
 
 <body
-  class="min-h-screen flex flex-col items-center justify-center p-4 bg-[#F7F4EB] relative overflow-hidden">
+  class="min-h-screen flex flex-col items-center justify-center
+         p-8 sm:p-4 bg-[#F7F4EB] relative overflow-hidden">
+
   <?php if (!empty($error)): ?>
-    <div id="error-alert" class="mb-4 rounded-xl border border-red-400 bg-red-100 px-4 py-3 text-red-700 text-sm font-sans">
+    <div id="error-alert"
+      class="mb-3 sm:mb-4 rounded-xl border border-red-400
+                bg-red-100 px-3 py-2 sm:px-4 sm:py-3
+                text-red-700 text-xs sm:text-sm font-sans">
       <?= $error ?>
     </div>
   <?php endif; ?>
 
   <script>
     const errorAlert = document.getElementById('error-alert');
-
     if (errorAlert) {
       setTimeout(() => {
         errorAlert.classList.add('opacity-0');
-
         errorAlert.remove();
       }, 2000);
     }
   </script>
-  <div
-    class="absolute top-0 left-0 w-72 h-72 bg-[#D9E4DD] rounded-full blur-3xl opacity-40 -z-10"></div>
-  <div
-    class="absolute bottom-0 right-0 w-96 h-96 bg-[#CAD2C5] rounded-full blur-2xl opacity-40 -z-10"></div>
-  <div
-    class="absolute top-1/3 right-10 w-52 h-52 bg-[#84A98C] rounded-full blur-xl opacity-30 -z-10"></div>
+
+  <div class="absolute top-0 left-0 w-56 h-56 sm:w-72 sm:h-72
+              bg-[#D9E4DD] rounded-full blur-3xl opacity-40 -z-10"></div>
+
+  <div class="absolute bottom-0 right-0 w-72 h-72 sm:w-96 sm:h-96
+              bg-[#CAD2C5] rounded-full blur-2xl opacity-40 -z-10"></div>
+
+  <div class="absolute top-1/3 right-6 sm:right-10 w-40 h-40 sm:w-52 sm:h-52
+              bg-[#84A98C] rounded-full blur-xl opacity-30 -z-10"></div>
 
   <div
-    class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-[#E4E1D8]">
-    <h1 class="text-3xl font-serif font-bold text-center mb-7 text-[#2F3E46]">
+    class="w-full max-w-sm sm:max-w-lg bg-white rounded-3xl shadow-2xl
+           p-5 sm:p-8 border border-[#E4E1D8]">
+
+    <h1 class="text-2xl sm:text-3xl font-serif font-bold
+               text-center mb-5 sm:mb-7 text-[#2F3E46]">
       Create Account
     </h1>
 
-    <form class="space-y-5" method="POST" action="">
+    <form class="space-y-4 sm:space-y-5" method="POST" action="">
+
       <div>
-        <label class="block mb-1 text-md font-medium text-[#2F3E46]">Username</label>
+        <label class="block mb-1 text-sm sm:text-md md:text-base font-medium text-[#2F3E46]">
+          Username
+        </label>
         <input
           type="text" name="username"
-          class="w-full p-2.5 border border-[#A4B3A6] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52796F] text-md"
-          placeholder="Enter username"
-          required />
+          class="w-full p-2 sm:p-2.5 border border-[#A4B3A6]
+                 rounded-xl focus:outline-none focus:ring-2
+                 focus:ring-[#52796F] text-sm sm:text-md"
+          placeholder="Enter username" required />
       </div>
 
       <div>
-        <label class="block mb-1 text-md font-medium text-[#2F3E46]">Full Name</label>
+        <label class="block mb-1 text-sm sm:text-md md:text-base font-medium text-[#2F3E46]">
+          Full Name
+        </label>
         <input
           type="text" name="name"
-          class="w-full p-2.5 border border-[#A4B3A6] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52796F] text-md"
-          placeholder="Enter your full name"
-          required />
+          class="w-full p-2 sm:p-2.5 border border-[#A4B3A6]
+                 rounded-xl focus:outline-none focus:ring-2
+                 focus:ring-[#52796F] text-sm sm:text-md"
+          placeholder="Enter your full name" required />
       </div>
 
       <div>
-        <label class="block mb-1 text-md font-medium text-[#2F3E46]">Email</label>
+        <label class="block mb-1 text-sm sm:text-md md:text-base font-medium text-[#2F3E46]">
+          Email
+        </label>
         <input
           type="email" name="email"
-          class="w-full p-2.5 border border-[#A4B3A6] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52796F] text-md"
-          placeholder="Enter your email"
-          required />
+          class="w-full p-2 sm:p-2.5 border border-[#A4B3A6]
+                 rounded-xl focus:outline-none focus:ring-2
+                 focus:ring-[#52796F] text-sm sm:text-md"
+          placeholder="Enter your email" required />
       </div>
 
       <div>
-        <label class="block mb-1 text-md font-medium text-[#2F3E46]">Password</label>
+        <label class="block mb-1 text-sm sm:text-md md:text-base font-medium text-[#2F3E46]">
+          Password
+        </label>
         <input
           type="password" name="password"
-          class="w-full p-2.5 border border-[#A4B3A6] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52796F] text-md"
-          placeholder="Enter password"
-          required />
+          class="w-full p-2 sm:p-2.5 border border-[#A4B3A6]
+                 rounded-xl focus:outline-none focus:ring-2
+                 focus:ring-[#52796F] text-sm sm:text-md"
+          placeholder="Enter password" required />
       </div>
 
       <div>
-        <label class="block mb-1 text-md font-medium text-[#2F3E46]">Confirm Password</label>
+        <label class="block mb-1 text-sm sm:text-md md:text-base font-medium text-[#2F3E46]">
+          Confirm Password
+        </label>
         <input
           type="password" name="confirm-pass"
-          class="w-full p-2.5 border border-[#A4B3A6] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52796F] text-md"
-          placeholder="Re-enter password"
-          required />
+          class="w-full p-2 sm:p-2.5 border border-[#A4B3A6]
+                 rounded-xl focus:outline-none focus:ring-2
+                 focus:ring-[#52796F] text-sm sm:text-md"
+          placeholder="Re-enter password" required />
       </div>
 
       <button
         type="submit" name="register"
-        class="w-full bg-[#52796F] hover:bg-[#354F52] text-white py-2.5 rounded-xl font-semibold transition shadow-lg text-md">
+        class="w-full bg-[#52796F] hover:bg-[#354F52]
+               text-white py-2 sm:py-2.5 rounded-xl
+               font-semibold transition shadow-lg
+               text-sm sm:text-md md:text-base">
         Create Account
       </button>
     </form>
 
-    <div class="text-center mt-5 text-[#2F3E46] text-md">
+    <div class="text-center mt-4 sm:mt-5 text-[#2F3E46] text-sm sm:text-md md:text-base">
       Already have an account?
-      <a href="login.php" class="text-[#52796F] font-semibold hover:underline">Login</a>
+      <a href="login.php"
+        class="text-[#52796F] font-semibold hover:underline">
+        Login
+      </a>
     </div>
+
   </div>
 </body>
+
 
 </html>
