@@ -20,5 +20,5 @@ while ($row = $result->fetch_assoc()) {
     $books[] = $row;
 }
 
-echo json_encode($books);
+echo json_encode($books);   
 ?>

@@ -1,0 +1,188 @@
+      // form.addEventListener("submit", async function (e) {
+      //   e.preventDefault();
+      //   const books = getBooks();
+      //   const bookId = document.getElementById("book-id").value;
+      //   const coverFile = coverInput.files[0]; // Ambil file dari input
+      //   let coverBase64 = "";
+
+      //   if (coverFile) {
+      //     // Konversi file ke Base64 jika ada file baru
+      //     coverBase64 = await convertToBase64(coverFile);
+      //   }
+
+      //   const newBook = {
+      //     judul: document.getElementById("judul").value,
+      //     penulis: document.getElementById("penulis").value,
+      //     status: document.getElementById("status").value,
+      //     catatan: document.getElementById("catatan").value,
+      //     // Gunakan coverBase64 jika ada, jika tidak, akan dihandle di logika UPDATE/CREATE
+      //     cover: coverBase64,
+      //   };
+
+      //   if (bookId) {
+      //     // UPDATE
+      //     const index = books.findIndex((b) => b.id === parseInt(bookId));
+      //     if (index !== -1) {
+      //       // Penting: Jika tidak ada file baru (coverBase64 kosong), pertahankan cover yang lama.
+      //       newBook.cover = coverBase64 || books[index].cover;
+      //       books[index] = { ...books[index], ...newBook };
+      //     }
+      //   } else {
+      //     // CREATE
+      //     const newId =
+      //       books.length > 0 ? Math.max(...books.map((b) => b.id)) + 1 : 1;
+      //     newBook.id = newId;
+      //     // Jika membuat baru dan tidak ada cover, set ke string kosong
+      //     if (!newBook.cover) newBook.cover = "";
+      //     books.push(newBook);
+      //   }
+
+      //   saveBooks(books);
+      //   closeModal(bookModal);
+      //   renderBooks();
+      // });
+
+   // function deleteBook(id) {
+      //   let books = getBooks();
+      //   books = books.filter((book) => book.id !== id);
+      //   saveBooks(books);
+      //   renderBooks();
+      // }
+
+
+      // function openEditModal(id) {
+      //   const books = getBooks();
+      //   const bookToEdit = books.find((book) => book.id === id);
+
+      //   if (bookToEdit) {
+      //     modalTitle.textContent = "Edit Book: " + bookToEdit.judul;
+      //     document.getElementById("book-id").value = bookToEdit.id;
+      //     document.getElementById("judul").value = bookToEdit.judul;
+      //     document.getElementById("penulis").value = bookToEdit.penulis;
+      //     document.getElementById("status").value = bookToEdit.status;
+      //     document.getElementById("catatan").value = bookToEdit.catatan;
+
+      //     // Tampilkan Cover lama di preview (NEW)
+      //     coverInput.value = ""; // Kosongkan input file
+      //     if (bookToEdit.cover) {
+      //       previewImg.src = bookToEdit.cover;
+      //       coverPreview.classList.remove("hidden");
+      //     } else {
+      //       previewImg.src = "";
+      //       coverPreview.classList.add("hidden");
+      //     }
+
+      //     openModal(bookModal);
+      //   }
+      // }
+
+
+        <!-- <div class="mb-6 border-t pt-4 border-light-gray">
+            <label for="cover" class="block mb-1 font-semibold"
+              >Cover Image (Optional):</label
+            >
+            <input
+              type="file"
+              id="cover"
+              name="cover"
+              accept="image/*"
+              class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark text-sm"
+            />
+            <div
+              id="cover-preview"
+              class="mt-2 w-20 h-20 border border-light-gray rounded-md bg-gray-100 flex items-center justify-center overflow-hidden hidden"
+            >
+              <img
+                id="preview-img"
+                class="max-w-full max-h-full object-cover"
+                alt="Cover Preview"
+              />
+            </div>
+          </div> -->
+
+
+     // NEW: Cover Elements
+      // const coverInput = document.getElementById("cover");
+      // const coverPreview = document.getElementById("cover-preview");
+      // const previewImg = document.getElementById("preview-img");\
+
+
+       // Event listener untuk Cover Preview (NEW)
+      coverInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImg.src = e.target.result;
+            coverPreview.classList.remove("hidden");
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // Jika file dibatalkan atau dihapus
+          coverPreview.classList.add("hidden");
+          previewImg.src = "";
+          // Jika sedang mode edit, tampilkan cover lama (jika ada)
+          const bookId = document.getElementById("book-id").value;
+          if (bookId) {
+            const books = getBooks();
+            const bookToEdit = books.find(
+              (book) => book.id === parseInt(bookId)
+            );
+            if (bookToEdit && bookToEdit.cover) {
+              previewImg.src = bookToEdit.cover;
+              coverPreview.classList.remove("hidden");
+            }
+          }
+        }
+      });
+
+
+         // Modal Hapus (DELETE)
+      function openDeleteModal(id) {
+        bookIdToDelete = id;
+        const books = getBooks();
+        const book = books.find((b) => b.id === id);
+        document.getElementById("book-title-to-delete").textContent = book
+          ? book.judul
+          : "Unknown";
+
+        openModal(deleteModal);
+      }
+
+
+            // function saveBooks(books) {
+      //   localStorage.setItem("biblios_books", JSON.stringify(books));
+      // }
+
+           function openCreateModal() {
+        modalTitle.textContent = "Add New Book";
+        form.reset();
+        document.getElementById("book-id").value = "";
+        coverInput.value = "";
+        previewImg.src = "";
+        coverPreview.classList.add("hidden"); // Sembunyikan preview
+        openModal(bookModal);
+      }
+
+          function closeModal(modalEl) {
+        modalEl.classList.add("hidden");
+        // Reset input file dan preview saat modal ditutup
+        coverInput.value = "";
+        previewImg.src = "";
+        coverPreview.classList.add("hidden");
+        form.reset();
+      }
+
+        <div class="mb-4">
+            <label for="catatan" class="block mb-1 font-semibold"
+              >Notes (Optional):</label
+            >
+            <textarea
+              id="catatan"
+              name="catatan"
+              rows="3"
+              class="w-full p-2 border border-light-gray rounded-md box-border resize-none focus:ring-accent-dark focus:border-accent-dark"
+            ></textarea>
+          </div>
+
+  document.getElementById("catatan").value = bookToEdit.notes || "";

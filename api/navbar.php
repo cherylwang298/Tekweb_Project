@@ -27,13 +27,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     </a>
 
     <!-- My Library -->
-    <a href="index.php"
+    <a href="my_library.php"
        class="relative group flex items-center text-base
-       <?= $currentPage == 'index.php'
+       <?= $currentPage == 'my_library.php'
           ? 'text-[#52796F] font-bold'
           : 'text-[#2F3E46]' ?>">
       <i class="fas fa-book-open mr-1"></i> My Library
-      <?php if ($currentPage == 'index.php'): ?>
+      <?php if ($currentPage == 'my_library.php'): ?>
         <span class="absolute bottom-0 left-0 w-full bg-[#52796F] h-[2px]"></span>
       <?php else: ?>
         <span class="absolute bottom-0 left-0 w-0 group-hover:w-full h-[2px] bg-[#52796F] transition-all duration-300 rounded-full"></span>
@@ -94,9 +94,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <i class="fas fa-home mr-2 w-3"></i> Home
   </a>
 
-  <a href="index.php"
+  <a href="my_library.php"
      class="py-2 px-3 rounded-md flex items-center
-     <?= $currentPage == 'index.php'
+     <?= $currentPage == 'my_library.php'
         ? 'bg-[#52796F] text-white'
         : 'hover:bg-[#F7F4EB]' ?>">
     <i class="fas fa-book-open mr-2 w-3"></i> My Library

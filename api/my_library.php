@@ -61,25 +61,25 @@ include 'navbar.php';
         >
           <div id="status-filters" class="flex flex-wrap gap-2 sm:space-x-4">
             <button
-              data-filter="Semua"
+              data-filter="all"
               class="filter-btn text-xs sm:text-sm font-semibold py-1 px-3 rounded-full border border-transparent transition active-filter"
             >
               All
             </button>
             <button
-              data-filter="Sudah Dibaca"
+              data-filter="finished"
               class="filter-btn text-xs sm:text-sm font-semibold py-1 px-3 rounded-full border border-transparent transition hover:border-accent-dark"
             >
               Finished
             </button>
             <button
-              data-filter="Sedang Dibaca"
+              data-filter="reading"
               class="filter-btn text-xs sm:text-sm font-semibold py-1 px-3 rounded-full border border-transparent transition hover:border-accent-dark"
             >
               Currently Reading
             </button>
             <button
-              data-filter="Ingin Dibaca"
+              data-filter="to_read"
               class="filter-btn text-xs sm:text-sm font-semibold py-1 px-3 rounded-full border border-transparent transition hover:border-accent-dark"
             >
               To Read
@@ -121,6 +121,7 @@ include 'navbar.php';
 
         <form id="book-form">
           <input type="hidden" id="book-id" name="id" />
+          <input type="hidden" id="book-id-selected" name="book_id">
 
           <div class="mb-4">
             <label for="judul" class="block mb-1 font-semibold"
@@ -133,6 +134,10 @@ include 'navbar.php';
               required
               class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
             />
+                <ul
+              id="title-dropdown"
+              class="border border-light-gray rounded-md bg-white hidden absolute z-50 w-full"
+            ></ul>
           </div>
           <div class="mb-4">
             <label for="penulis" class="block mb-1 font-semibold"
@@ -153,44 +158,10 @@ include 'navbar.php';
               name="status"
               class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
             >
-              <option value="Ingin Dibaca">To Read</option>
-              <option value="Sedang Dibaca">Currently Reading</option>
-              <option value="Sudah Dibaca">Finished</option>
+              <option value="to_read">To Read</option>
+              <option value="reading">Currently Reading</option>
+              <option value="finished">Finished</option>
             </select>
-          </div>
-          <div class="mb-4">
-            <label for="catatan" class="block mb-1 font-semibold"
-              >Notes (Optional):</label
-            >
-            <textarea
-              id="catatan"
-              name="catatan"
-              rows="3"
-              class="w-full p-2 border border-light-gray rounded-md box-border resize-none focus:ring-accent-dark focus:border-accent-dark"
-            ></textarea>
-          </div>
-
-          <div class="mb-6 border-t pt-4 border-light-gray">
-            <label for="cover" class="block mb-1 font-semibold"
-              >Cover Image (Optional):</label
-            >
-            <input
-              type="file"
-              id="cover"
-              name="cover"
-              accept="image/*"
-              class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark text-sm"
-            />
-            <div
-              id="cover-preview"
-              class="mt-2 w-20 h-20 border border-light-gray rounded-md bg-gray-100 flex items-center justify-center overflow-hidden hidden"
-            >
-              <img
-                id="preview-img"
-                class="max-w-full max-h-full object-cover"
-                alt="Cover Preview"
-              />
-            </div>
           </div>
 
           <button
@@ -198,7 +169,7 @@ include 'navbar.php';
             class="bg-accent-dark text-white py-3 px-4 rounded-md font-semibold text-lg w-full hover:bg-[#0E3C40] transition"
           >
             Save Book
-          </button>
+          </button>   
         </form>
       </div>
     </div>
@@ -254,6 +225,10 @@ include 'navbar.php';
       const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
       const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
 
+      const titleInput = document.getElementById("judul");
+      const authorInput = document.getElementById("penulis");
+      const dropdown = document.getElementById("title-dropdown");
+
       // Mobile Menu Elements
       const menuButton = document.getElementById("menu-button");
       const mobileMenu = document.getElementById("mobile-menu");
@@ -263,62 +238,28 @@ include 'navbar.php';
         mobileMenu.classList.toggle("hidden");
       });
 
-      // NEW: Cover Elements
-      const coverInput = document.getElementById("cover");
-      const coverPreview = document.getElementById("cover-preview");
-      const previewImg = document.getElementById("preview-img");
-
-      let currentFilter = "Semua";
+      let currentFilter = "all";
       let bookIdToDelete = null;
 
       // --- Utility Functions ---
-      function getBooks() {
-        const booksJSON = localStorage.getItem("biblios_books");
-        if (!booksJSON) {
-          const initialBooks = [
-            // Tambahkan cover: "" ke dummy data
-            {
-              id: 1,
-              judul: "Atomic Habits",
-              penulis: "James Clear",
-              status: "Sudah Dibaca",
-              catatan: "Great book for building small habits.",
-              cover: "",
-            },
-            {
-              id: 2,
-              judul: "The Name of the Wind",
-              penulis: "Patrick Rothfuss",
-              status: "Sedang Dibaca",
-              catatan: "Immersive and detailed fantasy.",
-              cover: "",
-            },
-            {
-              id: 3,
-              judul: "Moby Dick",
-              penulis: "Herman Melville",
-              status: "Ingin Dibaca",
-              catatan: "A classic that needs to be read.",
-              cover: "",
-            },
-          ];
-          saveBooks(initialBooks);
-          return initialBooks;
-        }
-        return JSON.parse(booksJSON);
-      }
+     async function getBooks() {
+       const res = await fetch("get_reading_lists.php");
 
-      function saveBooks(books) {
-        localStorage.setItem("biblios_books", JSON.stringify(books));
+  if (!res.ok) {
+    console.error("Failed to fetch reading list");
+    return [];
+  }
+
+  return await res.json();
       }
 
       function getStatusClasses(status) {
         switch (status) {
-          case "Sudah Dibaca":
+          case "finished":
             return "bg-success-bg text-success border border-success";
-          case "Sedang Dibaca":
+          case "reading":
             return "bg-info-bg text-info border border-info";
-          case "Ingin Dibaca":
+          case "to_read":
             return "bg-warning-bg text-warning border border-warning";
           default:
             return "bg-light-gray text-gray-600 border border-gray-400";
@@ -327,11 +268,11 @@ include 'navbar.php';
 
       function displayStatus(status) {
         switch (status) {
-          case "Sudah Dibaca":
+          case "finished":
             return "Finished";
-          case "Sedang Dibaca":
+          case "reading":
             return "Reading";
-          case "Ingin Dibaca":
+          case "to_read":
             return "To Read";
           default:
             return "Unknown";
@@ -357,164 +298,109 @@ include 'navbar.php';
       }
 
       // --- CRUD READ & Filter ---
-      function renderBooks() {
-        const allBooks = getBooks();
+      async function renderBooks() {
+       const allBooks = await getBooks();
 
-        const filteredBooks =
-          currentFilter === "Semua"
-            ? allBooks
-            : allBooks.filter((book) => book.status === currentFilter);
+  const filteredBooks =
+    currentFilter === "all"
+      ? allBooks
+      : allBooks.filter(book => book.status === currentFilter);
 
-        bookGrid.innerHTML = "";
+  bookGrid.innerHTML = "";
 
-        if (filteredBooks.length === 0) {
-          const filterLabel = document.querySelector(
-            `.filter-btn[data-filter="${currentFilter}"]`
-          ).textContent;
-          bookGrid.innerHTML = `<p class="col-span-full text-center p-12 text-gray-500">There are no books in the **${filterLabel}** category.</p>`;
-          return;
-        }
+  if (filteredBooks.length === 0) {
+    bookGrid.innerHTML = `
+      <p class="col-span-full text-center p-12 text-gray-500">
+        No books in this category.
+      </p>`;
+    return;
+  }
 
-        filteredBooks.forEach((book) => {
-          const statusClasses = getStatusClasses(book.status);
+  filteredBooks.forEach(book => {
+    const statusClasses = getStatusClasses(book.status);
 
-          // NEW: Logika untuk menampilkan cover
-          let coverContent;
-          if (book.cover && book.cover.startsWith("data:image")) {
-            // Jika ada data cover Base64
-            coverContent = `<img src="${book.cover}" alt="${book.judul} Cover" class="w-full h-full object-cover">`;
-          } else {
-            // Jika tidak ada cover
-            coverContent = `<span class="text-sm text-gray-500 font-serif">Book Cover</span>`;
-          }
+    const cover = book.book_cover
+      ? `<img src="${book.book_cover}" class="w-full h-full object-cover">`
+      : `<span class="text-sm text-gray-500">No Cover</span>`;
 
-          const card = document.createElement("div");
-          card.classList.add(
-            "book-card",
-            "bg-white",
-            "rounded-lg",
-            "shadow-md",
-            "p-5",
-            "flex",
-            "flex-col",
-            "transition",
-            "duration-300",
-            "hover:shadow-lg",
-            "hover:-translate-y-1"
-          );
+    bookGrid.innerHTML += `
+      <div class="bg-white rounded-lg shadow-md p-5 flex flex-col">
+        <div class="text-xs font-semibold px-3 py-1 rounded-md w-fit ${statusClasses}">
+          ${displayStatus(book.status)}
+        </div>
 
-          card.innerHTML = `
-                        <div class="book-status self-start py-1 px-3 rounded-md text-xs font-semibold uppercase ${statusClasses}">${displayStatus(
-            book.status
-          )}</div>
-                        <div class="w-full h-40 bg-light-gray rounded-md mb-4 flex justify-center items-center overflow-hidden">
-                            ${coverContent}
-                        </div>
-                        <h3 class="font-serif text-xl mt-0 mb-1 text-accent-dark">${
-                          book.judul
-                        }</h3>
-                        <p class="text-sm text-gray-600 mb-4">By: ${
-                          book.penulis
-                        }</p>
-                        
-                        <div class="book-actions pt-2 mt-auto">
-                            <button onclick="openEditModal(${
-                              book.id
-                            })" class="text-gray-500 hover:text-accent-dark transition mr-3">
-                                <i class="fas fa-pencil-alt text-sm"></i> Edit
-                            </button>
-                            <button onclick="openDeleteModal(${
-                              book.id
-                            })" class="text-gray-500 hover:text-red-600 transition">
-                                <i class="fas fa-trash-alt text-sm"></i> Delete
-                            </button>
-                        </div>
-                    `;
-          bookGrid.appendChild(card);
-        });
+        <div class="w-full h-40 bg-light-gray rounded-md my-3 flex items-center justify-center overflow-hidden">
+          ${cover}
+        </div>
+
+        <h3 class="font-serif text-xl text-accent-dark">
+          ${book.title}
+        </h3>
+
+        <p class="text-sm text-gray-600 mb-2">
+          By ${book.author}
+        </p>
+
+        <div class="mt-auto pt-3 flex gap-3">
+          <button onclick="openEditModal(${book.reading_id})"
+            class="text-sm text-gray-500 hover:text-accent-dark">
+            Edit
+          </button>
+
+          <button onclick="openDeleteModal(${book.reading_id})"
+            class="text-sm text-gray-500 hover:text-red-600">
+            Delete
+          </button>
+        </div>
+      </div>
+    `;
+  });
       }
 
-      // --- CRUD CREATE & UPDATE ---
+      // // --- CRUD CREATE & UPDATE ---
+//craye
       form.addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const books = getBooks();
-        const bookId = document.getElementById("book-id").value;
-        const coverFile = coverInput.files[0]; // Ambil file dari input
-        let coverBase64 = "";
+  e.preventDefault();
 
-        if (coverFile) {
-          // Konversi file ke Base64 jika ada file baru
-          coverBase64 = await convertToBase64(coverFile);
-        }
+  const formData = new FormData(form);
+  for (const [key, value] of formData.entries()) {
+  console.log(key, value);
+}
 
-        const newBook = {
-          judul: document.getElementById("judul").value,
-          penulis: document.getElementById("penulis").value,
-          status: document.getElementById("status").value,
-          catatan: document.getElementById("catatan").value,
-          // Gunakan coverBase64 jika ada, jika tidak, akan dihandle di logika UPDATE/CREATE
-          cover: coverBase64,
-        };
+  const res = await fetch("add_to_readlist.php", {
+    method: "POST",
+    body: formData,
+  });
 
-        if (bookId) {
-          // UPDATE
-          const index = books.findIndex((b) => b.id === parseInt(bookId));
-          if (index !== -1) {
-            // Penting: Jika tidak ada file baru (coverBase64 kosong), pertahankan cover yang lama.
-            newBook.cover = coverBase64 || books[index].cover;
-            books[index] = { ...books[index], ...newBook };
-          }
-        } else {
-          // CREATE
-          const newId =
-            books.length > 0 ? Math.max(...books.map((b) => b.id)) + 1 : 1;
-          newBook.id = newId;
-          // Jika membuat baru dan tidak ada cover, set ke string kosong
-          if (!newBook.cover) newBook.cover = "";
-          books.push(newBook);
-        }
+  const result = await res.json();
 
-        saveBooks(books);
-        closeModal(bookModal);
-        renderBooks();
-      });
+  if (!result.success) {
+    alert(result.message || "Failed to save book");
+    return;
+  }
 
-      // Event listener untuk Cover Preview (NEW)
-      coverInput.addEventListener("change", function () {
-        const file = this.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            previewImg.src = e.target.result;
-            coverPreview.classList.remove("hidden");
-          };
-          reader.readAsDataURL(file);
-        } else {
-          // Jika file dibatalkan atau dihapus
-          coverPreview.classList.add("hidden");
-          previewImg.src = "";
-          // Jika sedang mode edit, tampilkan cover lama (jika ada)
-          const bookId = document.getElementById("book-id").value;
-          if (bookId) {
-            const books = getBooks();
-            const bookToEdit = books.find(
-              (book) => book.id === parseInt(bookId)
-            );
-            if (bookToEdit && bookToEdit.cover) {
-              previewImg.src = bookToEdit.cover;
-              coverPreview.classList.remove("hidden");
-            }
-          }
-        }
-      });
+  closeModal(bookModal);
+  renderBooks();
+});
 
       // --- CRUD DELETE (Menggunakan Modal) ---
-      function deleteBook(id) {
-        let books = getBooks();
-        books = books.filter((book) => book.id !== id);
-        saveBooks(books);
-        renderBooks();
-      }
+      async function deleteBook(id) {
+  const res = await fetch("delete_from_reading_list.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+
+  const result = await res.json();
+
+  if (!result.success) {
+    alert("Failed to delete book");
+    return;
+  }
+
+  renderBooks();
+}
+
 
       // --- Filter Logic ---
       filterBtns.forEach((btn) => {
@@ -543,14 +429,13 @@ include 'navbar.php';
         modalEl.classList.remove("hidden");
       }
 
+  
+
       function closeModal(modalEl) {
-        modalEl.classList.add("hidden");
-        // Reset input file dan preview saat modal ditutup
-        coverInput.value = "";
-        previewImg.src = "";
-        coverPreview.classList.add("hidden");
-        form.reset();
-      }
+  modalEl.classList.add("hidden");
+  form.reset();
+}
+
 
       // Buka modal Tambah/Edit
       openModalBtn.addEventListener("click", () => openCreateModal());
@@ -570,53 +455,93 @@ include 'navbar.php';
 
       // Modal Tambah (CREATE)
       function openCreateModal() {
-        modalTitle.textContent = "Add New Book";
-        form.reset();
-        document.getElementById("book-id").value = "";
-        coverInput.value = "";
-        previewImg.src = "";
-        coverPreview.classList.add("hidden"); // Sembunyikan preview
-        openModal(bookModal);
-      }
+  modalTitle.textContent = "Add New Book";
+  form.reset();
+  document.getElementById("book-id").value = "";
+  openModal(bookModal);
+}
 
       // Modal Edit (UPDATE)
-      function openEditModal(id) {
-        const books = getBooks();
-        const bookToEdit = books.find((book) => book.id === id);
 
-        if (bookToEdit) {
-          modalTitle.textContent = "Edit Book: " + bookToEdit.judul;
-          document.getElementById("book-id").value = bookToEdit.id;
-          document.getElementById("judul").value = bookToEdit.judul;
-          document.getElementById("penulis").value = bookToEdit.penulis;
-          document.getElementById("status").value = bookToEdit.status;
-          document.getElementById("catatan").value = bookToEdit.catatan;
 
-          // Tampilkan Cover lama di preview (NEW)
-          coverInput.value = ""; // Kosongkan input file
-          if (bookToEdit.cover) {
-            previewImg.src = bookToEdit.cover;
-            coverPreview.classList.remove("hidden");
-          } else {
-            previewImg.src = "";
-            coverPreview.classList.add("hidden");
-          }
+      async function openEditModal(id) {
+  const books = await getBooks();
+  const bookToEdit = books.find((book) => book.reading_id === id);
 
-          openModal(bookModal);
-        }
-      }
+  if (!bookToEdit) return;
 
-      // Modal Hapus (DELETE)
-      function openDeleteModal(id) {
-        bookIdToDelete = id;
-        const books = getBooks();
-        const book = books.find((b) => b.id === id);
-        document.getElementById("book-title-to-delete").textContent = book
-          ? book.judul
-          : "Unknown";
+  modalTitle.textContent = "Edit Book: " + bookToEdit.title;
+  document.getElementById("book-id").value = bookToEdit.reading_id;
+  document.getElementById("judul").value = bookToEdit.title;
+  document.getElementById("penulis").value = bookToEdit.author;
+  document.getElementById("status").value = bookToEdit.status;
 
-        openModal(deleteModal);
-      }
+  if (bookToEdit.book_cover) {
+    previewImg.src = bookToEdit.book_cover;
+    coverPreview.classList.remove("hidden");
+  }
+
+  openModal(bookModal);
+}
+
+  // aautocom
+  titleInput.addEventListener("input", async () => {
+  const q = titleInput.value.trim();
+
+  if (q.length < 2) {
+    dropdown.classList.add("hidden");
+    dropdown.innerHTML = "";
+    return;
+  }
+
+  const res = await fetch(`search_books.php?q=${encodeURIComponent(q)}`);
+  const books = await res.json();
+
+  dropdown.innerHTML = "";
+
+  if (books.length === 0) {
+    dropdown.classList.add("hidden");
+    return;
+  }
+
+  books.forEach(book => {
+    const li = document.createElement("li");
+    li.textContent = `${book.title} — ${book.author}`;
+    li.className = "px-3 py-2 hover:bg-light-gray cursor-pointer";
+
+    // li.onclick = () => {
+    //   titleInput.value = book.title;
+    //   authorInput.value = book.author;
+    //   dropdown.classList.add("hidden");
+    // };
+    li.onclick = () => {
+  titleInput.value = book.title;
+  authorInput.value = book.author;
+
+  document.getElementById("book-id-selected").value = book.id;
+
+  dropdown.classList.add("hidden");
+};
+
+
+    dropdown.appendChild(li);
+  });
+
+  dropdown.classList.remove("hidden");
+});
+
+
+      async function openDeleteModal(id) {
+  bookIdToDelete = id;
+  const books = await getBooks();
+  const book = books.find(b => b.reading_id === id);
+
+  document.getElementById("book-title-to-delete").textContent =
+    book ? book.title : "Unknown";
+
+  openModal(deleteModal);
+}
+
 
       confirmDeleteBtn.addEventListener("click", () => {
         if (bookIdToDelete !== null) {
@@ -677,23 +602,5 @@ include 'navbar.php';
         renderBooks();
       });
     </script>
-  </body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-
-    <!-- tailwind cdn lnk -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!--css kepisah nek perlu  -->
-    <link rel="stylesheet" href="styles.css" />
-    <script src="script.js"></script>
-  </head>
-  <body>
-    <p>Test</p>
-    <h1>check</h1>
   </body>
 </html>
