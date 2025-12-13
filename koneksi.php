@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost';
-$db_user = 'tekweb';
-$db_pass = 'tekweb123';
+$db_user = 'root';
+$db_pass = '';
 $db_name = 'tekweb_project';
 
 // Membuat koneksi
@@ -12,6 +12,4 @@ if ($conn->connect_error) {
     http_response_code(500);
     die(json_encode(["error" => "Database connection failed"]));
 }
-
-$conn->set_charset("utf8mb4");
 ?>

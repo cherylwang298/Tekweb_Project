@@ -1,3 +1,14 @@
+<?php
+session_start();
+require_once "db.php";
+include "navbar.php";
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,17 +43,6 @@
 
 <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    <!-- HEADER -->
-    <header class="flex justify-between items-center py-5">
-        <div class="font-serif text-3xl font-bold text-accent-dark">Biblios</div>
-        <nav class="hidden sm:flex text-sm font-semibold text-gray-700 space-x-4">
-            <a href="home.html" class="text-accent-dark font-bold"><i class="fas fa-home mr-1"></i> Home</a>
-            <a href="index.html" class="hover:text-accent-dark transition"><i class="fas fa-book-open mr-1"></i> Library</a>
-            <a href="statistik.html" class="hover:text-accent-dark transition"><i class="fas fa-chart-bar mr-1"></i> Statistics</a>
-            <a href="profile.html" class="hover:text-accent-dark transition"><i class="fas fa-user mr-1"></i> Profile</a>
-        </nav>
-    </header>
-
     <hr class="border-t border-light-gray mb-6">
 
     <!-- SEARCH + FILTER + ADD -->
@@ -58,15 +58,36 @@
                 </div>
             </div>
 
-            <select id="rating-filter" 
-                    class="p-2 w-[25%] border border-light-gray rounded-md focus:ring-accent-dark focus:border-accent-dark shadow-sm appearance-none bg-white">
-                <option selected class="text-gray-500">Filter by Ratings</option>
-                <option value="1">★</option>
-                <option value="2">★★</option>
-                <option value="3">★★★</option>
-                <option value="4">★★★★</option>
-                <option value="5">★★★★★</option>
-            </select>
+            <div id="rating-filter" class="flex items-center gap-2 bg-white border border-light-gray rounded-xl p-1 shadow-sm">
+                <button data-rating="all" class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
+                        bg-accent-dark text-white transition">
+                    All</button>
+
+                <button data-rating="1"
+                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
+                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
+                    ★</button>
+
+                <button data-rating="2"
+                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
+                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
+                    ★★</button>
+
+                <button data-rating="3"
+                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
+                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
+                    ★★★</button>
+
+                <button data-rating="4"
+                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
+                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
+                    ★★★★</button>
+
+                <button data-rating="5"
+                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
+                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
+                    ★★★★★</button>
+            </div>  
         </div>
 
         <!-- Add Book Button -->
@@ -133,7 +154,7 @@
                 <h2 id="details-title" class="font-serif text-3xl font-bold text-accent-dark mb-1"></h2>
                 <p id="details-author" class="text-lg text-gray-700 mb-3">By </p>
                 <p id="details-rating" class="font-semibold text-xl text-yellow-600 mb-6 flex items-center">
-                    <i class="fas fa-star mr-1"></i> 5.0 / 5
+                    <i class="fas fa-star mr-1"></i> 5.0 / 5.0
                 </p>
                 
                 <button id="btn-rate-book" class="hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
@@ -156,7 +177,7 @@
                 
                 <div class="flex-1">
                     <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-rating">Rating (1-5):</label>
-                    <input type="number" id="user-rating" min="1" max="5" required
+                    <input type="number" id="user-rating" min="0" max="5" step="0.5" placeholder="0.0 - 5.0"
                         class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm">
                 </div>
                 
@@ -179,24 +200,16 @@
 
 <!-- JAVASCRIPT -->
 <script>
-    // ✅ Initialize allBooks as empty array
     window.allBooks = [];
 
-    let currentUserId = 0;
-
-    async function loadCurrentUser(){
-        const res = await fetch("api/get_session_user.php");
-        const data = await res.json();
-        currentUserId = data.user_id;
-    }
-    loadCurrentUser();
+    const currentUserId = <?= (int)$_SESSION['user_id'] ?>;
 
     /* ----------------------------------------------------
     FETCH BOOK LIST FROM DATABASE
     ---------------------------------------------------- */
     async function loadBooks() {
         try {
-            const res = await fetch("api/get_books.php");
+            const res = await fetch("get_books.php");
             const books = await res.json();
             window.allBooks = books;
             renderBooks(books);
@@ -211,7 +224,7 @@
         const form = new FormData();
         for (const key in data) form.append(key, data[key]);
 
-        const res = await fetch("api/add_book.php", {
+        const res = await fetch("add_book.php", {
             method: "POST",
             body: form
         });
@@ -224,28 +237,13 @@
         const form = new FormData();
         for (const key in data) form.append(key, data[key]);
 
-        const res = await fetch("api/update_book.php", {
+        const res = await fetch("update_book.php", {
             method: "POST",
             body: form
         });
 
         return res.json();
     }
-
-    /* ----------------------------------------------------
-    DELETE BOOK
-    ---------------------------------------------------- */
-    // async function deleteBook(id) {
-    //     const form = new FormData();
-    //     form.append("id", id);
-
-    //     const res = await fetch("api/delete_book.php", {
-    //         method: "POST",
-    //         body: form
-    //     });
-
-    //     return res.json();
-    // }
 
     // SEARCH FUNCTION
     function filterBooks() {
@@ -274,8 +272,11 @@
         books.forEach(book => {
             const coverUrl = book.book_cover || 'images/default-book-cover.png';
             container.innerHTML += `
-                <div class="p-5 rounded-xl shadow bg-white hover:shadow-lg transition cursor-pointer"
-                    onclick="openDetailsModal(${book.id})">
+                <div class="group bg-white rounded-2xl p-5 shadow
+                       transition-all duration-300 ease-out
+                       hover:-translate-y-2 hover:shadow-2xl
+                       active:scale-95 cursor-pointer"
+                    onclick="handleBookClick(${book.id})">
                     <img src="${coverUrl}" alt="${book.title}"
                         class="w-full h-64 object-cover rounded-xl mb-3" 
                         onerror="this.src='images/default-book-cover.png'">
@@ -286,6 +287,12 @@
         });
     }
 
+    function handleBookClick(bookId) {
+        setTimeout(() => {
+            openDetailsModal(bookId);
+        }, 120);
+    }
+
     // LOAD ALL
     async function loadHome() {
         await loadBooks();
@@ -293,24 +300,39 @@
     loadHome();
 
 
-    /* ----------------------------------------------------
-    RATING SLIDER (DISABLED)
-    ---------------------------------------------------- */
-    // document.getElementById('rating-slider').addEventListener('input', e => {
-    //     document.getElementById('rating-value').textContent = e.target.value;
-    //     const min = parseFloat(e.target.value);
-    //     const filtered = allBooks.filter(b => b.rating >= min);
-    //     renderBooks(filtered);
-    // });
+    // RATING FILTER (STAR BUTTONS)
+    const ratingButtons = document.querySelectorAll(".rating-btn");
 
-    // RATING FILTER DROPDOWN
-    document.getElementById("rating-filter").addEventListener("change", async function() {
-        const minRating = this.value;
+    ratingButtons.forEach(button => {
+        button.addEventListener("click", () => {
 
-        const res = await fetch(`api/get_books_by_rating.php?minRating=${minRating}`);
-        const books = await res.json();
+            // Reset all buttons
+            ratingButtons.forEach(b => {
+                b.classList.remove("bg-accent-dark", "text-white");
+                b.classList.add("text-gray-500");
+            });
 
-        renderBooks(books);  
+            // Activate clicked button
+            button.classList.add("bg-accent-dark", "text-white");
+            button.classList.remove("text-gray-500");
+
+            const value = button.dataset.rating;
+
+            // Show all books
+            if (value === "all") {
+                renderBooks(window.allBooks);
+                return;
+            }
+
+            const minRating = parseFloat(value);
+
+            const filtered = window.allBooks.filter(b => {
+                const rating = parseFloat(b.avg_rating);
+                return !isNaN(rating) && rating >= minRating;
+            });
+
+            renderBooks(filtered);
+        });
     });
 
 
@@ -397,7 +419,7 @@
     // OPEN DETAIL MODAL
     async function openDetailsModal(id) {
         try {
-            const res = await fetch(`api/get_book_details.php?id=${id}`);
+            const res = await fetch(`get_book_details.php?id=${id}`);
             const data = await res.json();
 
             if (data.error) {
@@ -411,7 +433,7 @@
             document.getElementById("details-author").textContent = "By " + data.author;
 
             document.getElementById("details-rating").textContent =
-                `⭐ ${parseFloat(data.avg_rating).toFixed(1)} / 5`;
+                `⭐ ${parseFloat(data.avg_rating).toFixed(1)} / 5.0`;
 
             document.getElementById("details-synopsis").textContent =
                 data.synopsis?.trim() ? data.synopsis : "Synopsis not available.";
@@ -446,21 +468,22 @@
 
     // LOAD USER RATING
     async function loadUserRating(bookId) {
-        const res = await fetch(`api/get_user_rating.php?book_id=${bookId}&user_id=${currentUserId}`);
+        const res = await fetch(`get_user_rating.php?book_id=${bookId}&user_id=${currentUserId}`);
         const data = await res.json();
 
         const rateButton = document.getElementById("btn-rate-book");
         const ratingForm = document.getElementById("rating-form");
 
         if (!data || data.rating === null) {
-            // User hasn't rated → show button, hide form
+            // User hasn't rated: show button, hide form
             rateButton.classList.remove("hidden");
             ratingForm.classList.add("hidden");
             return;
         }
 
-        // User already rated → hide button and form
+        // User already rated: hide button and form
         rateButton.classList.add("hidden");
+        ratingForm.reset();               
         ratingForm.classList.add("hidden");
     }
 
@@ -474,7 +497,8 @@
     document.getElementById("rating-form").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const rating = document.getElementById("user-rating").value;
+        const ratingInput = document.getElementById("user-rating").value;
+        const rating = ratingInput === "" ? null : parseFloat(ratingInput);
         const review = document.getElementById("user-review").value;
         const bookId = document.getElementById("details-modal").dataset.bookId;
 
@@ -484,7 +508,7 @@
         formData.append("rating", rating);
         formData.append("review", review);
 
-        const res = await fetch("api/rate_book.php", {
+        const res = await fetch("rate_book.php", {
             method: "POST",
             body: formData,
         });

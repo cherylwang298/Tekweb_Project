@@ -1,10 +1,11 @@
 <?php
+session_start();
 require_once "db.php";
 
-$user_id = $_POST["user_id"] ?? 0;
-$book_id = $_POST["book_id"] ?? 0;
-$rating  = $_POST["rating"] ?? null;
-$review  = $_POST["review"] ?? null;
+$user_id = $_SESSION['user_id'] ?? 0;
+$book_id = $_POST['book_id'];
+$rating  = $_POST['rating'];
+$review  = $_POST['review'];
 
 if (!$user_id || !$book_id) {
     echo json_encode(["success" => false, "message" => "Missing user_id or book_id"]);
@@ -21,7 +22,7 @@ $sql = "
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("iiis", $user_id, $book_id, $rating, $review);
+$stmt->bind_param("iids", $user_id, $book_id, $rating, $review);
 $stmt->execute();
 
 echo json_encode(["success" => true]);
