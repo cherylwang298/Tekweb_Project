@@ -58,14 +58,17 @@ if ($selected_book_id) {
   if ($row = $res->fetch_assoc()) {
     $book_id = $row['id'];
   } else {
-    // Insert buku baru
-    $stmt = $conn->prepare("
-      INSERT INTO books (title, author)
-      VALUES (?, ?)
-    ");
-    $stmt->bind_param("ss", $title, $author);
-    $stmt->execute();
-    $book_id = $stmt->insert_id;
+    // // Insert buku baru
+    // $stmt = $conn->prepare("
+    //   INSERT INTO books (title, author)
+    //   VALUES (?, ?)
+    // ");
+    // $stmt->bind_param("ss", $title, $author);
+    // $stmt->execute();
+    // $book_id = $stmt->insert_id;
+
+    echo json_encode(["success" => false, "message" => "Book not available in library"]);
+exit;
   }
 }
 

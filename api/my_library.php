@@ -3,6 +3,10 @@ session_start();
 require_once "db.php";
 include 'navbar.php';
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -18,6 +22,7 @@ include 'navbar.php';
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
+
 
     <script>
       tailwind.config = {
@@ -174,6 +179,84 @@ include 'navbar.php';
       </div>
     </div>
 
+    <div id="toast" class="fixed top-5 right-5 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50">
+  <!-- notif gabisa add soalnya ga ada di db -->
+</div>
+
+      <div
+      id="edit-status-modal"
+      class="hidden fixed inset-0 z-10 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-primary-bg p-6 sm:p-8 rounded-xl shadow-2xl w-full sm:w-11/12 max-w-lg transform duration-300 max-h-[90vh] overflow-y-auto"
+      >
+        <span
+          class="close-btn text-gray-500 hover:text-gray-800 text-3xl font-bold float-right cursor-pointer"
+          >&times;</span
+        >
+        <h2
+          id="modal-title"
+          class="font-serif text-xl sm:text-2xl text-accent-dark mb-4"
+        >
+          Add New Book
+        </h2>
+
+        <form id="edit-status-form">
+          <input type="hidden" id="book-idEdit" name="id" />
+          <input type="hidden" id="book-id-selectedEdit" name="book_id">
+
+          <div class="mb-4">
+            <label for="judul" class="block mb-1 font-semibold"
+              >Book Title:</label
+            >
+            <input
+              type="text"
+              id="judulEdit"
+              name="judul"
+              required
+              class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
+            />
+                <ul
+              id="title-dropdown"
+              class="border border-light-gray rounded-md bg-white hidden absolute z-50 w-full"
+            ></ul>
+          </div>
+          <div class="mb-4">
+            <label for="penulis" class="block mb-1 font-semibold"
+              >Author:</label
+            >
+            <input
+              type="text"
+              id="penulisEdit"
+              name="penulis"
+              required
+              class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
+            />
+          </div>
+          <div class="mb-4">
+            <label for="status" class="block mb-1 font-semibold">Status:</label>
+            <select
+              id="statusEdit"
+              name="status"
+              class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
+            >
+              <option value="to_read">To Read</option>
+              <option value="reading">Currently Reading</option>
+              <option value="finished">Finished</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            class="bg-accent-dark text-white py-3 px-4 rounded-md font-semibold text-lg w-full hover:bg-[#0E3C40] transition"
+          >
+            Update
+          </button>   
+        </form>
+      </div>
+    </div>
+
+
     <div
       id="delete-modal"
       class="hidden fixed inset-0 z-20 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4"
@@ -224,6 +307,8 @@ include 'navbar.php';
       const filterBtns = document.querySelectorAll(".filter-btn");
       const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
       const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
+      const editStatusModal = document.getElementById('edit-status-modal');
+      const editForm = document.getElementById('edit-status-form');
 
       const titleInput = document.getElementById("judul");
       const authorInput = document.getElementById("penulis");
@@ -240,6 +325,22 @@ include 'navbar.php';
 
       let currentFilter = "all";
       let bookIdToDelete = null;
+
+      function showToast(message, type = "error") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+
+  // ganti warna background sesuai type
+  toast.className = `fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg opacity-100 transition-opacity duration-300 z-50 ${
+    type === "error" ? "bg-red-500" : "bg-green-500"
+  }`;
+
+  // hide otomatis setelah 2.5 detik
+  setTimeout(() => {
+    toast.classList.remove("opacity-100");
+    toast.classList.add("opacity-0");
+  }, 2500);
+}
 
       // --- Utility Functions ---
      async function getBooks() {
@@ -343,12 +444,14 @@ include 'navbar.php';
 
         <div class="mt-auto pt-3 flex gap-3">
           <button onclick="openEditModal(${book.reading_id})"
-            class="text-sm text-gray-500 hover:text-accent-dark">
+            class="text-gray-500 hover:text-accent-dark transition mr-3">
+              <i class="fas fa-pencil-alt text-sm"></i>
             Edit
           </button>
 
           <button onclick="openDeleteModal(${book.reading_id})"
-            class="text-sm text-gray-500 hover:text-red-600">
+            class="text-gray-500 hover:text-red-600 transition">
+             <i class="fas fa-trash-alt text-sm"></i>
             Delete
           </button>
         </div>
@@ -357,7 +460,7 @@ include 'navbar.php';
   });
       }
 
-      // // --- CRUD CREATE & UPDATE ---
+      // // --- CRUD CREATE
 //craye
       form.addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -376,16 +479,38 @@ include 'navbar.php';
 
   if (!result.success) {
     alert(result.message || "Failed to save book");
+    showToast(result.message, "error")
     return;
   }
 
+  showToast("Book added successfully", "success")
   closeModal(bookModal);
   renderBooks();
 });
 
+  // update status:
+editForm.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const formData = new FormData(editForm);
+
+  const res = await fetch("edit_status.php", {
+    method: "POST",
+    body: formData
+  });
+
+  const result = await res.json();
+  if (!result.success) {
+    alert(result.message || "Failed to update book");
+    return;
+  }
+
+  closeModal(editStatusModal);
+  renderBooks();
+});
+
       // --- CRUD DELETE (Menggunakan Modal) ---
-      async function deleteBook(id) {
-  const res = await fetch("delete_from_reading_list.php", {
+  async function deleteBook(id) {
+  const res = await fetch("deleteBook_readingList.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id }),
@@ -394,95 +519,122 @@ include 'navbar.php';
   const result = await res.json();
 
   if (!result.success) {
-    alert("Failed to delete book");
+    // alert("Failed to delete book");
+    showToast("Failed to delete book", "error")
     return;
   }
 
+  showToast('Book deleted successfully', 'success')
   renderBooks();
 }
 
-
-      // --- Filter Logic ---
-      filterBtns.forEach((btn) => {
-        btn.addEventListener("click", function () {
-          filterBtns.forEach((b) =>
-            b.classList.remove(
-              "active-filter",
-              "border-accent-dark",
-              "bg-accent-dark/10"
-            )
-          );
-          this.classList.add(
-            "active-filter",
-            "border-accent-dark",
-            "bg-accent-dark/10"
-          );
-
-          currentFilter = this.dataset.filter;
-          renderBooks();
-        });
+  //fungsi delete book dari readlin g list + back
+      confirmDeleteBtn.addEventListener("click", () => {
+        if (bookIdToDelete !== null) {
+          deleteBook(bookIdToDelete);
+          closeModal(deleteModal);
+        }
       });
 
-      // --- Modal Control Functions ---
-
-      function openModal(modalEl) {
-        modalEl.classList.remove("hidden");
-      }
-
-  
-
-      function closeModal(modalEl) {
-  modalEl.classList.add("hidden");
-  form.reset();
-}
+      cancelDeleteBtn.addEventListener("click", () => {
+        closeModal(deleteModal);
+      });
 
 
-      // Buka modal Tambah/Edit
+
+  // Filtering sesuai status
+  filterBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      filterBtns.forEach((b) =>
+        b.classList.remove(
+          "active-filter",
+          "border-accent-dark",
+          "bg-accent-dark/10"
+        )
+      );
+      this.classList.add(
+        "active-filter",
+        "border-accent-dark",
+        "bg-accent-dark/10"
+      );
+
+      currentFilter = this.dataset.filter;
+      renderBooks();
+    });
+  });
+
+  // Buka tutup modal
+  function openModal(modalEl) {
+    modalEl.classList.remove("hidden");
+  }
+
+  function closeModal(modalEl) {
+    modalEl.classList.add("hidden");
+    form.reset();
+  }
+
+
+  //ini buka tutup modal function:
+      // Add Book modal (open)
       openModalBtn.addEventListener("click", () => openCreateModal());
 
-      // Tutup modal (untuk kedua modal)
+      // Tutup modal ------> buat fungsi buat semua modal sekalian
       closeBtns.forEach((btn) =>
         btn.addEventListener("click", () => {
           closeModal(bookModal);
           closeModal(deleteModal);
+          closeModal(editStatusModal);
         })
       );
 
       window.addEventListener("click", (event) => {
         if (event.target == bookModal) closeModal(bookModal);
+        if (event.target == editStatusModal) closeModal(editStatusModal);
         if (event.target == deleteModal) closeModal(deleteModal);
       });
 
       // Modal Tambah (CREATE)
       function openCreateModal() {
-  modalTitle.textContent = "Add New Book";
-  form.reset();
-  document.getElementById("book-id").value = "";
-  openModal(bookModal);
-}
+        modalTitle.textContent = "Add New Book";
+        form.reset();
+        document.getElementById("book-id").value = "";
+        openModal(bookModal);
+      }
 
-      // Modal Edit (UPDATE)
-
-
+      // Modal Edit -> open
       async function openEditModal(id) {
-  const books = await getBooks();
-  const bookToEdit = books.find((book) => book.reading_id === id);
+        const books = await getBooks();
+        const bookToEdit = books.find((book) => book.reading_id === id);
 
-  if (!bookToEdit) return;
+        if (!bookToEdit) return;
 
-  modalTitle.textContent = "Edit Book: " + bookToEdit.title;
-  document.getElementById("book-id").value = bookToEdit.reading_id;
-  document.getElementById("judul").value = bookToEdit.title;
-  document.getElementById("penulis").value = bookToEdit.author;
-  document.getElementById("status").value = bookToEdit.status;
+        modalTitle.textContent = "Edit Book: " + bookToEdit.title;
+        document.getElementById("book-idEdit").value = bookToEdit.reading_id;
+        document.getElementById("judulEdit").value = bookToEdit.title;
+        document.getElementById("penulisEdit").value = bookToEdit.author;
+        document.getElementById("statusEdit").value = bookToEdit.status;
 
-  if (bookToEdit.book_cover) {
-    previewImg.src = bookToEdit.book_cover;
-    coverPreview.classList.remove("hidden");
-  }
+        if (bookToEdit.book_cover) {
+          previewImg.src = bookToEdit.book_cover;
+          coverPreview.classList.remove("hidden");
+        }
 
-  openModal(bookModal);
-}
+        openModal(editStatusModal);
+      }
+
+
+    //open delete modal
+      async function openDeleteModal(id) {
+        bookIdToDelete = id;
+        const books = await getBooks();
+        const book = books.find(b => b.reading_id === id);
+
+        document.getElementById("book-title-to-delete").textContent =
+        book ? book.title : "Unknown";
+
+        openModal(deleteModal);
+      }
+
 
   // aautocom
   titleInput.addEventListener("input", async () => {
@@ -509,11 +661,6 @@ include 'navbar.php';
     li.textContent = `${book.title} — ${book.author}`;
     li.className = "px-3 py-2 hover:bg-light-gray cursor-pointer";
 
-    // li.onclick = () => {
-    //   titleInput.value = book.title;
-    //   authorInput.value = book.author;
-    //   dropdown.classList.add("hidden");
-    // };
     li.onclick = () => {
   titleInput.value = book.title;
   authorInput.value = book.author;
@@ -531,28 +678,8 @@ include 'navbar.php';
 });
 
 
-      async function openDeleteModal(id) {
-  bookIdToDelete = id;
-  const books = await getBooks();
-  const book = books.find(b => b.reading_id === id);
-
-  document.getElementById("book-title-to-delete").textContent =
-    book ? book.title : "Unknown";
-
-  openModal(deleteModal);
-}
 
 
-      confirmDeleteBtn.addEventListener("click", () => {
-        if (bookIdToDelete !== null) {
-          deleteBook(bookIdToDelete);
-          closeModal(deleteModal);
-        }
-      });
-
-      cancelDeleteBtn.addEventListener("click", () => {
-        closeModal(deleteModal);
-      });
 
       // Inisialisasi: Tampilkan semua buku saat halaman dimuat
       document.addEventListener("DOMContentLoaded", () => {

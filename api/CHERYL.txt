@@ -186,3 +186,9 @@
           </div>
 
   document.getElementById("catatan").value = bookToEdit.notes || "";
+
+  // li.onclick = () => {
+    //   titleInput.value = book.title;
+    //   authorInput.value = book.author;
+    //   dropdown.classList.add("hidden");
+    // };
