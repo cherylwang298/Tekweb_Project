@@ -177,7 +177,7 @@ if (!isset($_SESSION['user_id'])) {
                 
                 <div class="flex-1">
                     <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-rating">Rating (1-5):</label>
-                    <input type="number" id="user-rating" min="0" max="5" step="0.5" placeholder="0.0 - 5.0"
+                    <input type="number" id="user-rating" min="0" max="5" step="0.5" placeholder="0.0 - 5.0" required
                         class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm">
                 </div>
                 
