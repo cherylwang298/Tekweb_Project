@@ -121,12 +121,40 @@ $conn->close();
         transform: translateY(0) scale(1);
       }
     }
+
+
+    ::-webkit-scrollbar {
+      width: 14px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #F7F4EB;
+      border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg,
+          #84A98C,
+          #52796F);
+      border-radius: 999px;
+      border: 2px solid #F7F4EB;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg,
+          #52796F,
+          #354F52);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
   </style>
 </head>
 
 <body
   class="min-h-screen flex flex-col items-center justify-center
-         p-8 sm:p-4 bg-[#F7F4EB] relative overflow-hidden">
+         p-8 sm:p-4 bg-[#F7F4EB] relative">
 
   <?php if (!empty($error)): ?>
     <div id="error-alert"
