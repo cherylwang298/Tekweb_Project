@@ -256,6 +256,67 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
 
+    <!-- BOOK DETAILS MODAL -->
+<div id="details-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-30">
+    <div class="bg-primary-bg rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative">
+
+        <span id="close-details" class="absolute right-6 top-3 text-gray-600 hover:text-gray-900 text-3xl cursor-pointer font-light" onclick="closeRatingModal()">&times;</span>
+
+        <div class="flex flex-col sm:flex-row gap-6 mb-6">
+            
+            <div class="flex-shrink-0 w-full sm:w-1/3 max-w-[200px] mx-auto sm:mx-0">
+                <img id="details-cover" class="w-full h-80 object-cover rounded-xl shadow-lg" alt="Book Cover">
+            </div>
+
+            <div class="flex-grow pt-4">
+                <h2 id="details-title" class="font-serif text-3xl font-bold text-accent-dark mb-1"></h2>
+                <p id="details-author" class="text-lg text-gray-700 mb-3">By </p>
+                <p id="details-rating" class="font-semibold text-xl text-yellow-600 mb-6 flex items-center">
+                    <i class="fas fa-star mr-1"></i> 5.0 / 5.0
+                </p>
+                
+                <!-- btn-rate-book -->
+                <button id="btn-rate-modal" class=" hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
+                    Rate This Book
+                </button>
+            </div>
+        </div>
+
+        <hr class="border-t border-light-gray my-6">
+
+        <h3 class="font-serif text-xl font-bold text-accent-dark mb-2">Synopsis</h3>
+        <p id="details-synopsis" class="text-gray-700 mb-8 leading-relaxed"></p>
+
+        <h3 class="font-serif text-xl font-bold text-accent-dark mb-4">Reviews</h3>
+        
+        <form id="rating-form" class="bg-light-gray p-6 rounded-xl shadow-inner mb-8 border border-gray-200">
+            <h4 class="font-serif text-xl font-bold text-accent-dark mb-4">Add Your Rating & Review</h4>
+            
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                
+                <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-rating">Rating (1-5):</label>
+                    <input type="number" id="user-rating" min="0" max="5" step="0.5" placeholder="0.0 - 5.0"
+                        class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm">
+                </div>
+                
+                <div class="flex-1 md:flex-grow-[2]"> <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-review">Your Review:</label>
+                    <textarea id="user-review" rows="3"
+                            class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm resize-none"></textarea>
+                </div>
+            </div>
+            
+            <button type="submit" class="bg-accent-dark text-white py-2 px-6 rounded-md font-semibold hover:bg-[#0E3C40] transition shadow-md">
+                Submit Review
+            </button>
+        </form>
+
+        <div id="details-reviews" class="space-y-4 mx-3"></div>
+
+    </div>
+</div>
+
+
 
     <div
       id="delete-modal"
@@ -295,6 +356,10 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
 
+  </body>
+</html>
+
+
     <script>
       // DOM Elements
       const bookGrid = document.getElementById("book-grid");
@@ -309,6 +374,15 @@ if (!isset($_SESSION['user_id'])) {
       const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
       const editStatusModal = document.getElementById('edit-status-modal');
       const editForm = document.getElementById('edit-status-form');
+      // const rateButton = document.getElementById("btn-rate-book");
+      const rateButton = document.getElementById("btn-rate-modal");
+      if (rateButton) {
+        rateButton.addEventListener("click", () => {
+          document.getElementById("rating-form").classList.remove("hidden");
+        });
+      }
+
+      const currentUserId = <?= json_encode($_SESSION['user_id']) ?>;
 
       const titleInput = document.getElementById("judul");
       const authorInput = document.getElementById("penulis");
@@ -340,6 +414,11 @@ if (!isset($_SESSION['user_id'])) {
     toast.classList.remove("opacity-100");
     toast.classList.add("opacity-0");
   }, 2500);
+}
+
+function closeRatingModal() {
+  const ratingModal = document.getElementById("details-modal");
+  ratingModal.classList.add("hidden");
 }
 
       // --- Utility Functions ---
@@ -454,15 +533,42 @@ if (!isset($_SESSION['user_id'])) {
              <i class="fas fa-trash-alt text-sm"></i>
             Delete
           </button>
+
+          <button 
+          data-book-id="${book.reading_id}"
+          onclick="openDetailsModal(${book.reading_id})" class="btn-rate-book bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-xs hover:bg-[#0E3C40] transition">
+                    Rate This Book
+                </button>
         </div>
       </div>
     `;
   });
       }
 
+
+      function openDetailsModal(id){
+        document.getElementById("details-modal").dataset.bookId = id;
+        document.getElementById("details-modal").classList.remove("hidden");
+        loadUserRating(id);
+      }
+
+      bookGrid.addEventListener("click", (e)=> {
+        const btn = e.target.closest(".btn-rate-book");
+        if(!btn) return;
+
+        const bookId = btn.dataset.bookId;
+
+        const modal = document.getElementById("details-modal");
+        modal.dataset.bookId = bookId;
+        modal.classList.remove("hidden");
+
+          loadUserRating(bookId);
+        }
+      )
+
       // // --- CRUD CREATE
 //craye
-      form.addEventListener("submit", async function (e) {
+  form.addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const formData = new FormData(form);
@@ -570,7 +676,7 @@ editForm.addEventListener("submit", async function(e) {
 
   function closeModal(modalEl) {
     modalEl.classList.add("hidden");
-    form.reset();
+    //form.reset();
   }
 
 
@@ -728,6 +834,77 @@ editForm.addEventListener("submit", async function(e) {
 
         renderBooks();
       });
+
+
+
+
+  
+   // LOAD USER RATING
+    async function loadUserRating(bookId) {
+        const res = await fetch(`get_user_rating.php?book_id=${bookId}&user_id=${currentUserId}`);
+        const data = await res.json();
+
+        const rateButton = document.getElementById("btn-rate-modal");
+        const ratingForm = document.getElementById("rating-form");
+
+        if (!data || data.rating === null) {
+            // User hasn't rated: show button, hide form
+            rateButton.classList.remove("hidden");
+            ratingForm.classList.add("hidden");
+            return;
+        }
+
+        // User already rated: hide button and form
+        rateButton.classList.add("hidden");
+        ratingForm.reset();               
+        ratingForm.classList.add("hidden");
+    }
+
+
+     // USER CLICKS RATE -> SHOW FORM
+    document.getElementById("btn-rate-modal").addEventListener("click", () => {
+        document.getElementById("rating-form").classList.remove("hidden");
+    });
+
+
+    // SUBMITTING RATING / REVIEW
+    document.getElementById("rating-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const ratingInput = document.getElementById("user-rating").value;
+        const rating = ratingInput === "" ? null : parseFloat(ratingInput);
+        const review = document.getElementById("user-review").value;
+        const bookId = document.getElementById("details-modal").dataset.bookId;
+
+        const formData = new FormData();
+        formData.append("user_id", currentUserId);
+        formData.append("book_id", bookId);
+        formData.append("rating", rating);
+        formData.append("review", review);
+
+        const res = await fetch("rate_book.php", {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.message || "Failed to submit review");
+            return;
+        }
+
+        // After submit:
+        document.getElementById("rating-form").classList.add("hidden");
+        // document.getElementByClassName("btn-rate-book").classList.add("hidden");
+        document.querySelectorAll(".btn-rate-book").forEach((button) => {
+          button.classList.add("hidden");
+        })
+
+        document.getElementById("btn-rate-modal").classList.add("hidden");
+        // Reload modal content
+        openDetailsModal(bookId);
+    });
+
+
     </script>
-  </body>
-</html>
