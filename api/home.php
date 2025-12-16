@@ -224,19 +224,23 @@ if (!isset($_SESSION['user_id'])) {
                             <div class="star" data-value="2">
                                 <i class="far fa-star star-empty"></i>
                                 <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>                            </div>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
                             <div class="star" data-value="3">
                                 <i class="far fa-star star-empty"></i>
                                 <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>                            </div>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
                             <div class="star" data-value="4">
                                 <i class="far fa-star star-empty"></i>
                                 <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>                            </div>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
                             <div class="star" data-value="5">
                                 <i class="far fa-star star-empty"></i>
                                 <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>                            </div>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
                         </div>
 
                         <span id="rating-preview" class="ml-2 md-mt-1 text-sm text-gray-600">
