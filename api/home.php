@@ -37,6 +37,40 @@ if (!isset($_SESSION['user_id'])) {
             }
         }
     </script>
+    <style>
+        .star {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .star i {
+            position: absolute;
+            inset: 0;
+            font-size: 1.75rem;
+            line-height: 1;
+        }
+
+        /* empty outline */
+        .star-empty {
+            color: #d1d5db;
+        }
+
+        /* half fill */
+        .star-half {
+            color: #facc15;
+            clip-path: inset(0 50% 0 0);
+            display: none;
+        }
+
+        /* full fill */
+        .star-full {
+            color: #facc15;
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="bg-primary-bg font-sans text-text-dark leading-relaxed">
@@ -157,7 +191,7 @@ if (!isset($_SESSION['user_id'])) {
                     <i class="fas fa-star mr-1"></i> 5.0 / 5.0
                 </p>
                 
-                <button id="btn-rate-book" class="hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
+                <button id="btn-rate-book" onclick="scrollToRating()" class="hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
                     Rate This Book
                 </button>
             </div>
@@ -176,12 +210,45 @@ if (!isset($_SESSION['user_id'])) {
             <div class="flex flex-col md:flex-row gap-4 mb-4">
                 
                 <div class="flex-1">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-rating">Rating (1-5):</label>
-                    <input type="number" id="user-rating" min="0" max="5" step="0.5" placeholder="0.0 - 5.0"
-                        class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3" for="user-rating">Rating:</label>
+                    <!-- STAR RATING INPUT -->
+                    <div id="star-rating" class="flex flex-row items-center gap-2 md:flex-col md:items-start md:gap-1" >
+                        <input type="hidden" id="user-rating" required>
+
+                        <div class="flex">
+                            <div class="star" data-value="1">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="2">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="3">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="4">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="5">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                        </div>
+
+                        <span id="rating-preview" class="ml-2 md-mt-1 text-sm text-gray-600">
+                            0.0 / 5.0
+                        </span>
+                    </div>
                 </div>
-                
-                <div class="flex-1 md:flex-grow-[2]"> <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-review">Your Review:</label>
+                <div class="flex-1 md:flex-grow-[2]"> <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-review">Review:</label>
                     <textarea id="user-review" rows="3"
                             class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm resize-none"></textarea>
                 </div>
@@ -416,6 +483,21 @@ if (!isset($_SESSION['user_id'])) {
         }
     });
 
+    function scrollToRating() {
+        const modal = document.getElementById("details-modal");
+        modal.classList.remove("hidden"); // ensure visible
+
+        requestAnimationFrame(() => {
+            const target = document.getElementById("rating-form");
+            if (!target) return;
+
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        });
+    }
+
     // OPEN DETAIL MODAL
     async function openDetailsModal(id) {
         try {
@@ -490,8 +572,70 @@ if (!isset($_SESSION['user_id'])) {
     // USER CLICKS RATE -> SHOW FORM
     document.getElementById("btn-rate-book").addEventListener("click", () => {
         document.getElementById("rating-form").classList.remove("hidden");
+        initHalfStarRating(); // show star rating
     });
 
+    /* ----------------------------------------------------
+    HALF STAR RATING (REUSABLE)
+    ---------------------------------------------------- */
+    function initHalfStarRating(containerId = "star-rating") {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const stars = container.querySelectorAll(".star");
+        const hiddenInput = container.querySelector("#user-rating");
+        const preview = container.querySelector("#rating-preview");
+
+        let lockedRating = 0;
+
+        function render(rating) {
+            stars.forEach(star => {
+                const value = parseInt(star.dataset.value);
+                const empty = star.querySelector(".star-empty");
+                const half = star.querySelector(".star-half");
+                const full = star.querySelector(".star-full");
+
+                empty.style.display = "block";
+                half.style.display = "none";
+                full.style.display = "none";
+
+                if (rating >= value) {
+                    empty.style.display = "none";
+                    full.style.display = "block";
+                } else if (rating === value - 0.5) {
+                    empty.style.display = "block";
+                    half.style.display = "block";
+                }
+            });
+
+            preview.textContent = `${rating.toFixed(1)} / 5.0`;
+        }
+
+        stars.forEach(star => {
+            const value = parseInt(star.dataset.value);
+
+            star.addEventListener("mousemove", e => {
+                const rect = star.getBoundingClientRect();
+                const isLeft = e.clientX < rect.left + rect.width / 2;
+                render(isLeft ? value - 0.5 : value);
+            });
+
+            star.addEventListener("mouseleave", () => {
+                render(lockedRating);
+            });
+
+            star.addEventListener("click", e => {
+                const rect = star.getBoundingClientRect();
+                const isLeft = e.clientX < rect.left + rect.width / 2;
+
+                lockedRating = isLeft ? value - 0.5 : value;
+                hiddenInput.value = lockedRating;
+                render(lockedRating);
+            });
+        });
+
+        render(0);
+    }
 
     // SUBMITTING RATING / REVIEW
     document.getElementById("rating-form").addEventListener("submit", async (e) => {
@@ -527,7 +671,6 @@ if (!isset($_SESSION['user_id'])) {
         // Reload modal content
         openDetailsModal(bookId);
     });
-
 
     // CLOSE MODAL BOOK DETAILS
     document.getElementById("close-details").onclick = () => document.getElementById("details-modal").classList.add("hidden");

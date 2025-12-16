@@ -144,24 +144,25 @@ if (isset($_POST['submit'])) {
     }
   </script>
 
-  <div
-    class="absolute top-0 left-0 w-60 h-60 sm:w-80 sm:h-80
-         bg-[#B7D1C3] rounded-full blur-3xl opacity-50 -z-10"
-    style="animation: blobMove1 20s ease-in-out infinite;">
-  </div>
+  <div class="absolute inset-0 overflow-hidden -z-10 pointer-events-none">
+    <div
+      class="absolute -top-20 -left-20 w-60 h-60 sm:w-80 sm:h-80
+         bg-[#B7D1C3] rounded-full blur-3xl opacity-50"
+      style="animation: blobMove1 20s ease-in-out infinite;">
+    </div>
 
+    <div
+      class="absolute -bottom-24 -right-24 w-72 h-72 sm:w-[22rem] sm:h-[22rem]
+         bg-[#84A98C] rounded-full blur-2xl opacity-45"
+      style="animation: blobMove2 26s ease-in-out infinite;">
+    </div>
 
-  <div
-    class="absolute bottom-0 right-0 w-72 h-72 sm:w-[22rem] sm:h-[22rem]
-         bg-[#84A98C] rounded-full blur-2xl opacity-45 -z-10"
-    style="animation: blobMove2 26s ease-in-out infinite;">
-  </div>
+    <div
+      class="absolute top-1/4 right-10 sm:right-20 w-44 h-44 sm:w-60 sm:h-60
+         bg-[#E9EDC9] rounded-full blur-xl opacity-40"
+      style="animation: blobMove3 18s ease-in-out infinite;">
+    </div>
 
-
-  <div
-    class="absolute top-1/3 right-6 sm:right-16 w-44 h-44 sm:w-60 sm:h-60
-         bg-[#E9EDC9] rounded-full blur-xl opacity-40 -z-10"
-    style="animation: blobMove3 18s ease-in-out infinite;">
   </div>
 
 
