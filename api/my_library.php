@@ -297,7 +297,7 @@ if (!isset($_SESSION['user_id'])) {
     <!-- BOOK DETAILS MODAL -->
      
 <div id="details-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-30">
-    <div class="bg-primary-bg rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative">
+    <div class="bg-primary-bg rounded-2xl shadow-2xl w-full max-w-3xl h-[80vh] overflow-y-auto p-6 relative">
 
         <span id="close-details" class="absolute right-6 top-3 text-gray-600 hover:text-gray-900 text-3xl cursor-pointer font-light" onclick="closeModal(document.getElementById('details-modal'))">&times;</span>
 
@@ -381,11 +381,6 @@ if (!isset($_SESSION['user_id'])) {
                 </div>
 
                 <!-- input end -->
-
-
-
-
-
 
                 </div>
                 
@@ -600,7 +595,8 @@ if (!isset($_SESSION['user_id'])) {
     const statusClasses = getStatusClasses(book.status);
 
     const cover = book.book_cover
-      ? `<img src="${book.book_cover}" class="w-full h-full object-cover">`
+      ? `<img src="../${book.book_cover}" class="w-full h-full object-cover"
+      onerror="this.src='../images/default-book-cover.png'">`
       : `<span class="text-sm text-gray-500">No Cover</span>`;
 
     bookGrid.innerHTML += `
@@ -660,7 +656,7 @@ if (!isset($_SESSION['user_id'])) {
       async function openDetailsModal(id){
         const modal = document.getElementById("details-modal");
         modal.dataset.bookId = id;
-        modal.classList.remove("hidden");
+      
 
         try{
           const res = await fetch(`get_book_details.php?id=${id}`);
@@ -670,8 +666,14 @@ if (!isset($_SESSION['user_id'])) {
           
           const data = JSON.parse(text);
 
-          document.getElementById("details-cover").src =
-            data.book_cover || "images/default-book-cover.png";
+          // document.getElementById("details-cover").src =
+          //   data.book_cover || "images/default-book-cover.png";
+
+          const coverImg = document.getElementById("details-cover");
+            coverImg.src = data.book_cover ? `../${data.book_cover}` : "../images/default-book-cover.png";
+            coverImg.onerror = () => {
+                coverImg.src = "../images/default-book-cover.png";
+            }
 
             document.getElementById("details-title").textContent = data.title;
             document.getElementById("details-author").textContent = "By " + data.author;
@@ -700,6 +702,8 @@ if (!isset($_SESSION['user_id'])) {
             }
 
             loadUserRating(id);
+
+              modal.classList.remove("hidden");
         } catch (error) {
           console.error(error);
           alert("Failed to load book details")

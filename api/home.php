@@ -162,7 +162,9 @@ if (!isset($_SESSION['user_id'])) {
 
             <div class="mb-4">
                 <label class="font-semibold">Book Cover Image URL:</label>
-                <input id="cover-input" type="text" placeholder="https://..." class="w-full p-2 border border-light-gray rounded-md">
+                <!--<input id="cover-input" type="text" placeholder="https://..." class="w-full p-2 border border-light-gray rounded-md"> -->
+                <input id="cover-input" type="file" placeholder="" class="w-full p-2 border border-light-gray rounded-md">
+
             </div>
 
             <button class="bg-accent-dark text-white py-2 px-4 rounded-md font-semibold hover:bg-[#0E3C40] transition w-full" type="submit">
@@ -337,7 +339,11 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         books.forEach(book => {
-            const coverUrl = book.book_cover || 'images/default-book-cover.png';
+            //const coverUrl = book.book_cover || 'images/default-book-cover.png';
+            
+            const coverUrl = book.book_cover ? `../${book.book_cover}` : '../images/default-book-cover.png';
+            console.log(book.book_cover);
+
             container.innerHTML += `
                 <div class="group bg-white rounded-2xl p-5 shadow
                        transition-all duration-300 ease-out
@@ -346,7 +352,7 @@ if (!isset($_SESSION['user_id'])) {
                     onclick="handleBookClick(${book.id})">
                     <img src="${coverUrl}" alt="${book.title}"
                         class="w-full h-64 object-cover rounded-xl mb-3" 
-                        onerror="this.src='images/default-book-cover.png'">
+                        onerror="this.src='../images/default-book-cover.png'">
 
                     <h3 class="font-bold text-lg">${book.title}</h3>
                     <p class="text-sm text-gray-600 mt-1">${book.author}</p>
@@ -424,7 +430,7 @@ if (!isset($_SESSION['user_id'])) {
             title: document.getElementById('title-input').value.trim(),
             author: document.getElementById('author-input').value.trim(),
             synopsis: document.getElementById('synopsis-input').value.trim(),
-            book_cover: document.getElementById('cover-input').value.trim()
+            book_cover: document.getElementById('cover-input').files[0]
         };
 
         // ✅ Validation for required fields
@@ -509,8 +515,16 @@ if (!isset($_SESSION['user_id'])) {
                 return;
             }
 
+            const coverImg = document.getElementById("details-cover");
+            coverImg.src = data.book_cover ? `../${data.book_cover}` : "../images/default-book-cover.png";
+            coverImg.onerror = () => {
+                coverImg.src = "../images/default-book-cover.png";
+            }
+
             // Fill modal
-            document.getElementById("details-cover").src = data.book_cover || "images/default-book-cover.png";
+            //edit
+            //document.getElementById("details-cover").src = data.book_cover ? `../${data.book_cover}` : "../images/default-book-cover.png";
+            //end edit
             document.getElementById("details-title").textContent = data.title;
             document.getElementById("details-author").textContent = "By " + data.author;
 
