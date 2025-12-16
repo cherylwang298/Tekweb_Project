@@ -13,6 +13,7 @@ $user_id = $_SESSION['user_id'];
 $sql = "
 SELECT
   rl.id AS reading_id,
+  rl.book_id AS book_id,
   rl.status,
   rl.added_at,
   b.id AS book_id,

@@ -1013,3 +1013,204 @@ filterBtns.forEach(btn => {
 ===================================================== */
 document.addEventListener("DOMContentLoaded", renderBooks);
 </script>
+
+
+
+
+
+RATINGAN
+
+ // RATING FILTER (STAR BUTTONS)
+    const ratingButtons = document.querySelectorAll(".rating-btn");
+
+    ratingButtons.forEach(button => {
+        button.addEventListener("click", () => {
+
+            // Reset all buttons
+            ratingButtons.forEach(b => {
+                b.classList.remove("bg-accent-dark", "text-white");
+                b.classList.add("text-gray-500");
+            });
+
+            // Activate clicked button
+            button.classList.add("bg-accent-dark", "text-white");
+            button.classList.remove("text-gray-500");
+
+            const value = button.dataset.rating;
+
+            // Show all books
+            if (value === "all") {
+                renderBooks(window.allBooks);
+                return;
+            }
+
+            const minRating = parseFloat(value);
+
+            const filtered = window.allBooks.filter(b => {
+                const rating = parseFloat(b.avg_rating);
+                return !isNaN(rating) && rating >= minRating;
+            });
+
+            renderBooks(filtered);
+        });
+    });
+
+// LOAD USER RATING
+    async function loadUserRating(bookId) {
+        const res = await fetch(`get_user_rating.php?book_id=${bookId}&user_id=${currentUserId}`);
+        const data = await res.json();
+
+        const rateButton = document.getElementById("btn-rate-book");
+        const ratingForm = document.getElementById("rating-form");
+
+        if (!data || data.rating === null) {
+            // User hasn't rated: show button, hide form
+            rateButton.classList.remove("hidden");
+            ratingForm.classList.add("hidden");
+            return;
+        }
+
+        // User already rated: hide button and form
+        rateButton.classList.add("hidden");
+        ratingForm.reset();               
+        ratingForm.classList.add("hidden");
+    }
+
+    // USER CLICKS RATE -> SHOW FORM
+    document.getElementById("btn-rate-book").addEventListener("click", () => {
+        document.getElementById("rating-form").classList.remove("hidden");
+        initHalfStarRating(); // show star rating
+    });
+
+    /* ----------------------------------------------------
+    HALF STAR RATING (REUSABLE)
+    ---------------------------------------------------- */
+    function initHalfStarRating(containerId = "star-rating") {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const stars = container.querySelectorAll(".star");
+        const hiddenInput = container.querySelector("#user-rating");
+        const preview = container.querySelector("#rating-preview");
+
+        let lockedRating = 0;
+
+        function render(rating) {
+            stars.forEach(star => {
+                const value = parseInt(star.dataset.value);
+                const empty = star.querySelector(".star-empty");
+                const half = star.querySelector(".star-half");
+                const full = star.querySelector(".star-full");
+
+                empty.style.display = "block";
+                half.style.display = "none";
+                full.style.display = "none";
+
+                if (rating >= value) {
+                    empty.style.display = "none";
+                    full.style.display = "block";
+                } else if (rating === value - 0.5) {
+                    empty.style.display = "block";
+                    half.style.display = "block";
+                }
+            });
+
+            preview.textContent = `${rating.toFixed(1)} / 5.0`;
+        }
+
+        stars.forEach(star => {
+            const value = parseInt(star.dataset.value);
+
+            star.addEventListener("mousemove", e => {
+                const rect = star.getBoundingClientRect();
+                const isLeft = e.clientX < rect.left + rect.width / 2;
+                render(isLeft ? value - 0.5 : value);
+            });
+
+            star.addEventListener("mouseleave", () => {
+                render(lockedRating);
+            });
+
+            star.addEventListener("click", e => {
+                const rect = star.getBoundingClientRect();
+                const isLeft = e.clientX < rect.left + rect.width / 2;
+
+                lockedRating = isLeft ? value - 0.5 : value;
+                hiddenInput.value = lockedRating;
+                render(lockedRating);
+            });
+        });
+
+        render(0);
+    }
+
+    // SUBMITTING RATING / REVIEW
+    document.getElementById("rating-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const ratingInput = document.getElementById("user-rating").value;
+        const rating = ratingInput === "" ? null : parseFloat(ratingInput);
+        const review = document.getElementById("user-review").value;
+        const bookId = document.getElementById("details-modal").dataset.bookId;
+
+        const formData = new FormData();
+        formData.append("user_id", currentUserId);
+        formData.append("book_id", bookId);
+        formData.append("rating", rating);
+        formData.append("review", review);
+
+        const res = await fetch("rate_book.php", {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.message || "Failed to submit review");
+            return;
+        }
+
+        // After submit:
+        document.getElementById("rating-form").classList.add("hidden");
+        document.getElementById("btn-rate-book").classList.add("hidden");
+
+        // Reload modal content
+        openDetailsModal(bookId);
+    });
+
+
+    rate_book.php|
+    <?php
+session_start();
+require_once "db.php";
+
+$user_id = $_SESSION['user_id'] ?? 0;
+$book_id = $_POST['book_id'];
+$rating  = $_POST['rating'];
+$review  = $_POST['review'];
+
+if (!$user_id || !$book_id) {
+    echo json_encode(["success" => false, "message" => "Missing user_id or book_id"]);
+    exit;
+}
+
+$sql = "
+    INSERT INTO ratings (user_id, book_id, rating, review)
+    VALUES (?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE 
+        rating = VALUES(rating),
+        review = VALUES(review),
+        created_at = CURRENT_TIMESTAMP
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("iids", $user_id, $book_id, $rating, $review);
+$stmt->execute();
+
+echo json_encode(["success" => true]);
+?> 
+
+
+
+
