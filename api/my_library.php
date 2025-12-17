@@ -23,7 +23,6 @@ if (!isset($_SESSION['user_id'])) {
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
-
     <script>
       tailwind.config = {
         theme: {
@@ -127,12 +126,9 @@ if (!isset($_SESSION['user_id'])) {
             </button>
           </div>
 
-          <button
-            id="open-modal-btn"
-            class="bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition w-full sm:w-auto"
-          >
-            + Add New Book
-          </button>
+          <button id="open-modal-btn">
+          
+          </button> 
         </div>
 
         <main
@@ -600,7 +596,10 @@ if (!isset($_SESSION['user_id'])) {
       : `<span class="text-sm text-gray-500">No Cover</span>`;
 
     bookGrid.innerHTML += `
-      <div class="bg-white rounded-lg shadow-md p-5 flex flex-col">
+      <div class="bg-white rounded-lg shadow-md p-5 flex flex-col cursor-pointer"
+      transition-all duration-300 ease-out
+      hover:-translate-y-2 hover:shadow-2xl
+      onclick="openDetailsModal(${book.book_id})">
         <div class="text-xs font-semibold px-3 py-1 rounded-md w-fit ${statusClasses}">
           ${displayStatus(book.status)}
         </div>
@@ -629,15 +628,6 @@ if (!isset($_SESSION['user_id'])) {
              <i class="fas fa-trash-alt text-sm"></i>
             Delete
           </button>
-
-
-               <button 
-          data-book-id="${book.book_id}"
-          onclick="openDetailsModal(${book.book_id})" class="btn-rate-book bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-xs hover:bg-[#0E3C40] transition">
-                  Details
-                </button>
-
-
                 </div>
       </div>
     `;

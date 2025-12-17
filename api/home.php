@@ -487,7 +487,7 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
         }
         formData.append("status", status);
 
-        const res = await fetch("add_to_readingList.php", {
+        const res = await fetch("add_to_readList.php", {
             method: "POST",
             body: formData,
             credentials: "same-origin"
@@ -501,6 +501,8 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
         } else {
             alert(data.message || "Failed to add to reading list");
         }
+
+        openDetailsModal(bookId);
     } catch (err) {
         console.error(err);
         alert("An error occurred. Please try again.");
@@ -528,6 +530,7 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
         try {
             const res = await fetch(`get_book_details.php?id=${id}`);
             const data = await res.json();
+            
 
             if (data.error) {
                 alert(data.error);
@@ -573,6 +576,7 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
             }
 
             document.getElementById("details-modal").dataset.bookId = id;
+            await checkReadingList(id);
             await loadUserRating(id);
 
             document.getElementById("details-modal").classList.remove("hidden");
@@ -582,6 +586,7 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
             alert("Could not load book details.");
         }
     }
+
 
     // LOAD USER RATING
     async function loadUserRating(bookId) {
@@ -715,6 +720,19 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
             document.getElementById("details-modal").classList.add("hidden");
     };
 
+
+    async function checkReadingList(bookId) {
+    const res = await fetch(`get_reading_list_status.php?book_id=${bookId}`);
+    const data = await res.json();
+
+    const btn = document.getElementById("btn-add-readinglist");
+
+    if (data.in_list) {
+        btn.classList.add("hidden");
+    } else {
+        btn.classList.remove("hidden");
+    }
+}
 
 </script>
 
