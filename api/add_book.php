@@ -14,11 +14,10 @@ if(!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-
 // Input
 $title = $_POST['title'];
 $author = $_POST['author'];
-$synopsis = $_POST['synopsis'];
+$synopsis = $_POST['synopsis'] ?? '';
 
 $book_cover = null;
 
@@ -43,6 +42,31 @@ if (isset($_FILES['book_cover']) && $_FILES['book_cover']['error'] === 0) {
     $book_cover = $uploadDirDB . $fileName;
 }
 
+// if (!empty($_FILES['book_cover']) && $_FILES['book_cover']['error'] === UPLOAD_ERR_OK) {
+
+//     $uploadDirServer = __DIR__ . "/../uploads/covers/";
+//     $uploadDirDB = "uploads/covers/";
+
+//     if (!is_dir($uploadDirServer)) {
+//         mkdir($uploadDirServer, 0777, true);
+//     }
+
+//     $ext = pathinfo($_FILES['book_cover']['name'], PATHINFO_EXTENSION);
+//     $fileName = uniqid("cover_", true) . "." . $ext;
+
+//     if (!move_uploaded_file($_FILES['book_cover']['tmp_name'], $uploadDirServer . $fileName)) {
+//         echo json_encode(["success" => false, "message" => "Failed to upload cover"]);
+//         exit;
+//     }
+
+//     $book_cover = $uploadDirDB . $fileName;
+// }
+
+
+if($book_cover === NULL){
+    $book_cover = "../images/default-book-cover.png";
+}
+
 // Cek duplikasi
 $check = $conn->prepare("SELECT id FROM books WHERE title=? AND author=?");
 $check->bind_param("ss", $title, $author);
@@ -53,6 +77,11 @@ if ($check->num_rows > 0) {
     echo json_encode(["success" => false, "message" => "Book already exists"]);
     exit;
 }
+
+if ($synopsis == NULL || $synopsis == ''){
+    $synopsis = "";
+}
+
 
 $stmt = $conn->prepare("INSERT INTO books (title, author, synopsis, book_cover) VALUES (?, ?, ?, ?)");
 $stmt->bind_param("ssss", $title, $author, $synopsis, $book_cover);

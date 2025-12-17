@@ -161,7 +161,7 @@ if (!isset($_SESSION['user_id'])) {
             </div>
 
             <div class="mb-4">
-                <label class="font-semibold">Book Cover Image URL:</label>
+                <label class="font-semibold">Book Cover Image:</label>
                 <!--<input id="cover-input" type="text" placeholder="https://..." class="w-full p-2 border border-light-gray rounded-md"> -->
                 <input id="cover-input" type="file" placeholder="" class="w-full p-2 border border-light-gray rounded-md">
 
@@ -193,9 +193,14 @@ if (!isset($_SESSION['user_id'])) {
                     <i class="fas fa-star mr-1"></i> 5.0 / 5.0
                 </p>
                 
+                <button id="btn-add-readinglist" onclick="addToReadingList(document.getElementById('details-modal').dataset.bookId)" class=" bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
+                    Add to Reading List
+                </button>
+
                 <button id="btn-rate-book" onclick="scrollToRating()" class="hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
                     Rate This Book
                 </button>
+
             </div>
         </div>
 
@@ -427,68 +432,81 @@ if (!isset($_SESSION['user_id'])) {
     document.getElementById('book-form').addEventListener('submit', async e => {
         e.preventDefault();
 
-        const newBook = {
-            title: document.getElementById('title-input').value.trim(),
-            author: document.getElementById('author-input').value.trim(),
-            synopsis: document.getElementById('synopsis-input').value.trim(),
-            book_cover: document.getElementById('cover-input').files[0]
-        };
+    const formData = new FormData();
+    formData.append("title", document.getElementById('title-input').value.trim());
+    formData.append("author", document.getElementById('author-input').value.trim());
+    formData.append("synopsis", document.getElementById('synopsis-input').value.trim());
 
-        // ✅ Validation for required fields
-        if (!newBook.title || !newBook.author) {
-            alert("Please fill in all required fields (Title and Author).");
-            return;
+    const coverInput = document.getElementById("cover-input");
+    if (coverInput.files.length > 0) {
+        formData.append("book_cover", coverInput.files[0]);
+    }
+
+    try {
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Adding...';
+
+        const res = await fetch("add_book.php", {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin"
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            alert(result.message || "Failed to add book");
+        } else {
+            e.target.reset();
+            document.getElementById('book-modal').classList.add('hidden');
+            await loadHome();
+            alert("Book added successfully!");
         }
 
-        // ✅ Check if allBooks exists and has data
-        if (!window.allBooks) {
-            window.allBooks = [];
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred. Please try again.");
+    }
+});
+
+
+   // ADD TO READING LIST
+async function addToReadingList(bookId, title = "", author = "", status = "to_read") {
+    try {
+        const formData = new FormData();
+        if (bookId) {
+            formData.append("book_id", bookId);
+        } else {
+            formData.append("judul", title);
+            formData.append("penulis", author);
         }
+        formData.append("status", status);
 
-        // ✅ Prevent duplicates
-        const exists = window.allBooks.some(b =>
-            b.title.toLowerCase() === newBook.title.toLowerCase() &&
-            b.author.toLowerCase() === newBook.author.toLowerCase()
-        );
+        const res = await fetch("add_to_readingList.php", {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin"
+        });
 
-        if (exists) {
-            alert("This book already exists in the system.");
-            return;
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Book added to your reading list!");
+            // opsional: bisa update UI misal tombol disable atau teks berubah
+        } else {
+            alert(data.message || "Failed to add to reading list");
         }
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred. Please try again.");
+    }
+}
 
-        try {
-            // ✅ Add loading state
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Adding...';
-
-            const result = await addBook(newBook);
-
-            if (result.success) {
-                // ✅ Success feedback
-                document.getElementById('book-form').reset();
-                modal.classList.add('hidden');
-                await loadHome(); // Reload books
-                alert("Book added successfully!");
-            } else {
-                alert(result.message || "Failed to add book. Please try again.");
-            }
-
-            // ✅ Restore button state
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-
-        } catch (error) {
-            console.error("Error adding book:", error);
-            alert("An error occurred. Please try again.");
-            
-            // Restore button state
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Add Book';
-        }
-    });
 
     function scrollToRating() {
         const modal = document.getElementById("details-modal");
@@ -515,6 +533,8 @@ if (!isset($_SESSION['user_id'])) {
                 alert(data.error);
                 return;
             }
+
+            
 
             const coverImg = document.getElementById("details-cover");
             coverImg.src = data.book_cover ? `../${data.book_cover}` : "../images/default-book-cover.png";
