@@ -1,6 +1,7 @@
 <?php
-session_start();
-require '../../config/koneksi.php';
+require 'config/koneksi.php';
+include 'partials/navbar.php';
+
 
 /* ================= AUTH ================= */
 if (!isset($_SESSION['user_id'])) {
@@ -88,11 +89,6 @@ tailwind.config = {
 
 <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
 
-<!-- NAVBAR -->
-<header class="py-5">
-    <?php include 'navbar.php'; ?>
-</header>
-
 <hr class="border-light-gray mb-8">
 
 <h1 class="font-serif text-2xl sm:text-3xl text-accent-dark mb-8">
@@ -170,7 +166,7 @@ tailwind.config = {
         View insights about your reading activity and book status.
     </p>
 
-    <a href="statistik.php"
+    <a href="index.php?page=statistik"
        class="inline-flex items-center bg-accent-dark text-white
               px-5 py-2.5 rounded-lg font-semibold hover:opacity-90 transition">
         <i class="fas fa-chart-bar mr-2"></i>

@@ -1,10 +1,10 @@
 <?php
-session_start();
-require_once "../../config/koneksi.php";
-include '../partials/navbar.php';
+
+require_once "config/koneksi.php";
+include "partials/navbar.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: index.php?page=login");
     exit;
 }
 ?>
@@ -48,6 +48,42 @@ if (!isset($_SESSION['user_id'])) {
         },
       };
     </script>
+
+
+<style>
+        .star {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .star i {
+            position: absolute;
+            inset: 0;
+            font-size: 1.75rem;
+            line-height: 1;
+        }
+
+        /* empty outline */
+        .star-empty {
+            color: #d1d5db;
+        }
+
+        /* half fill */
+        .star-half {
+            color: #facc15;
+            clip-path: inset(0 50% 0 0);
+            display: none;
+        }
+
+        /* full fill */
+        .star-full {
+            color: #facc15;
+            display: none;
+        }
+    </style>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap"
@@ -185,7 +221,7 @@ if (!isset($_SESSION['user_id'])) {
 
       <div
       id="edit-status-modal"
-      class="hidden fixed inset-0 z-10 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4"
+      class="hidden fixed inset-0 z-40 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4"
     >
       <div
         class="bg-primary-bg p-6 sm:p-8 rounded-xl shadow-2xl w-full sm:w-11/12 max-w-lg transform duration-300 max-h-[90vh] overflow-y-auto"
@@ -198,7 +234,7 @@ if (!isset($_SESSION['user_id'])) {
           id="modal-title"
           class="font-serif text-xl sm:text-2xl text-accent-dark mb-4"
         >
-          Add New Book
+          Edit Book Status
         </h2>
 
         <form id="edit-status-form">
@@ -215,6 +251,7 @@ if (!isset($_SESSION['user_id'])) {
               name="judul"
               required
               class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
+              readonly
             />
                 <ul
               id="title-dropdown"
@@ -231,7 +268,8 @@ if (!isset($_SESSION['user_id'])) {
               name="penulis"
               required
               class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
-            />
+              readonly
+              />
           </div>
           <div class="mb-4">
             <label for="status" class="block mb-1 font-semibold">Status:</label>
@@ -252,9 +290,115 @@ if (!isset($_SESSION['user_id'])) {
           >
             Update
           </button>   
-        </form>
+        </form>  
       </div>
     </div>
+
+    <!-- BOOK DETAILS MODAL -->
+     
+<div id="details-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-30">
+    <div class="bg-primary-bg rounded-2xl shadow-2xl w-full max-w-3xl h-[80vh] overflow-y-auto p-6 relative">
+
+        <span id="close-details" class="absolute right-6 top-3 text-gray-600 hover:text-gray-900 text-3xl cursor-pointer font-light" onclick="closeModal(document.getElementById('details-modal'))">&times;</span>
+
+        <div class="flex flex-col sm:flex-row gap-6 mb-6">
+            
+            <div class="flex-shrink-0 w-full sm:w-1/3 max-w-[200px] mx-auto sm:mx-0">
+                <img id="details-cover" class="w-full h-80 object-cover rounded-xl shadow-lg" alt="Book Cover">
+            </div>
+
+            <div class="flex-grow pt-4">
+                <h2 id="details-title" class="font-serif text-3xl font-bold text-accent-dark mb-1"></h2>
+                <p id="details-author" class="text-lg text-gray-700 mb-3">By </p>
+                <p id="details-rating" class="font-semibold text-xl text-yellow-600 mb-6 flex items-center">
+                    <i class="fas fa-star mr-1"></i> 5.0 / 5.0
+                </p>
+                
+                <!-- btn-rate-book -->
+                <button id="btn-rate-modal" class=" hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
+                    Rate This Book
+                </button>
+            </div>
+        </div>
+
+        <hr class="border-t border-light-gray my-6">
+
+        <h3 class="font-serif text-xl font-bold text-accent-dark mb-2">Synopsis</h3>
+        <p id="details-synopsis" class="text-gray-700 mb-8 leading-relaxed"></p>
+
+        <h3 class="font-serif text-xl font-bold text-accent-dark mb-4">Reviews</h3>
+        
+        <form id="rating-form" class="bg-light-gray p-6 rounded-xl shadow-inner mb-8 border border-gray-200">
+            <h4 class="font-serif text-xl font-bold text-accent-dark mb-4">Add Your Rating & Review</h4>
+            
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                
+                <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-rating">Rating (1-5):</label>
+                    <!-- <input type="number" id="user-rating" min="0" max="5" step="0.5" placeholder="0.0 - 5.0"
+                        class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm"> -->
+
+                        <!-- input star -->
+
+                          <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3" for="user-rating">Rating:</label>
+                    <!-- STAR RATING INPUT -->
+                    <div id="star-rating" class="flex flex-row items-center gap-2 md:flex-col md:items-start md:gap-1" >
+                        <input type="hidden" id="user-rating" required>
+
+                        <div class="flex">
+                            <div class="star" data-value="1">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="2">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="3">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="4">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="5">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                        </div>
+
+                        <span id="rating-preview" class="ml-2 md-mt-1 text-sm text-gray-600">
+                            0.0 / 5.0
+                        </span>
+                    </div>
+                </div>
+
+                <!-- input end -->
+
+                </div>
+                
+                <div class="flex-1 md:flex-grow-[2]"> <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-review">Your Review:</label>
+                    <textarea id="user-review" rows="3"
+                            class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm resize-none"></textarea>
+                </div>
+            </div>
+            
+            <button type="submit" class="bg-accent-dark text-white py-2 px-6 rounded-md font-semibold hover:bg-[#0E3C40] transition shadow-md">
+                Submit Review
+            </button>
+        </form>
+
+        <div id="details-reviews" class="space-y-4 mx-3"></div>
+
+    </div>
+ </div> 
 
 
     <div
@@ -295,6 +439,10 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
 
+  </body>
+</html>
+
+
     <script>
       // DOM Elements
       const bookGrid = document.getElementById("book-grid");
@@ -309,6 +457,8 @@ if (!isset($_SESSION['user_id'])) {
       const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
       const editStatusModal = document.getElementById('edit-status-modal');
       const editForm = document.getElementById('edit-status-form');
+  
+      const currentUserId = <?= json_encode($_SESSION['user_id']) ?>;
 
       const titleInput = document.getElementById("judul");
       const authorInput = document.getElementById("penulis");
@@ -342,9 +492,33 @@ if (!isset($_SESSION['user_id'])) {
   }, 2500);
 }
 
+  // load user rating
+
+  async function loadUserRating(bookId) {
+    const res = await fetch(`/tekweb_project/api/users/get_user_rating.php?book_id=${bookId}&user_id=${currentUserId}`);
+    const data = await res.json();
+
+    const rateBtn = document.getElementById("btn-rate-modal");
+    const ratingForm = document.getElementById("rating-form");
+
+
+    if(!data || data.rating === null) {
+      rateBtn.classList.remove("hidden");
+      ratingForm.classList.add("hidden");
+      return;
+    }
+
+
+    rateBtn.classList.add("hidden");
+    //ratingForm.reset();
+    ratingForm.classList.add("hidden");
+  }
+
+
+
       // --- Utility Functions ---
      async function getBooks() {
-       const res = await fetch("get_reading_lists.php");
+       const res = await fetch("/tekweb_project/api/reading_list/get_reading_lists.php");
 
   if (!res.ok) {
     console.error("Failed to fetch reading list");
@@ -421,7 +595,8 @@ if (!isset($_SESSION['user_id'])) {
     const statusClasses = getStatusClasses(book.status);
 
     const cover = book.book_cover
-      ? `<img src="${book.book_cover}" class="w-full h-full object-cover">`
+      ? `<img src="/tekweb_project/${book.book_cover}" class="w-full h-full object-cover"
+      onerror="this.src='/tekweb_project/images/default-book-cover.png'">`
       : `<span class="text-sm text-gray-500">No Cover</span>`;
 
     bookGrid.innerHTML += `
@@ -442,27 +617,169 @@ if (!isset($_SESSION['user_id'])) {
           By ${book.author}
         </p>
 
-        <div class="mt-auto pt-3 flex gap-3">
-          <button onclick="openEditModal(${book.reading_id})"
+        <div class="mt-auto mx-auto pt-3 flex gap-3">
+          <button onclick="openEditModal(${book.reading_id}); event.stopPropagation()"
             class="text-gray-500 hover:text-accent-dark transition mr-3">
               <i class="fas fa-pencil-alt text-sm"></i>
             Edit
           </button>
 
-          <button onclick="openDeleteModal(${book.reading_id})"
-            class="text-gray-500 hover:text-red-600 transition">
+          <button onclick="openDeleteModal(${book.reading_id}); event.stopPropagation()"
+            class="text-gray-500 hover:text-red-600 transition mr-4">
              <i class="fas fa-trash-alt text-sm"></i>
             Delete
           </button>
-        </div>
+
+
+               <button 
+          data-book-id="${book.book_id}"
+          onclick="openDetailsModal(${book.book_id})" class="btn-rate-book bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-xs hover:bg-[#0E3C40] transition">
+                  Details
+                </button>
+
+
+                </div>
       </div>
     `;
   });
       }
 
+
+      // function openDetailsModal(id){
+      //  const modal = document.getElementById("details-modal");
+      //   modal.dataset.bookId = id;
+      //   modal.classList.remove("hidden");
+
+      //   loadUserRating(id);
+      // }
+
+      async function openDetailsModal(id){
+        const modal = document.getElementById("details-modal");
+        modal.dataset.bookId = id;
+      
+
+        try{
+          const res = await fetch(`/tekweb_project/api/books/get_book_details.php?id=${id}`);
+          
+          const text = await res.text();
+          console.log(text);
+          
+          const data = JSON.parse(text);
+
+          // document.getElementById("details-cover").src =
+          //   data.book_cover || "images/default-book-cover.png";
+
+          const coverImg = document.getElementById("details-cover");
+            coverImg.src = data.book_cover ? `/tekweb_project/${data.book_cover}` : "/tekweb_project/images/default-book-cover.png";
+            coverImg.onerror = () => {
+                coverImg.src = "/tekweb_project/images/default-book-cover.png";
+            }
+
+            document.getElementById("details-title").textContent = data.title;
+            document.getElementById("details-author").textContent = "By " + data.author;
+
+            const avg = data.avg_rating ? parseFloat(data.avg_rating).toFixed(1) : "0.0";
+            document.getElementById("details-rating").innerHTML = `<i class="fas fa-star mr-1"></i> ${avg} / 5.0`;
+
+            document.getElementById("details-synopsis").textContent = data.synopsis?.trim() ? data.synopsis : "Synopsis not available.";
+
+            const reviewContainer = document.getElementById("details-reviews");
+            reviewContainer.innerHTML = "";
+
+            if(!data.reviews || data.reviews.length === 0) {
+              reviewContainer.innerHTML = "";
+
+            } else {
+              data.reviews.forEach(r => {
+                reviewContainer.innerHTML += `
+                  <div class="border p-3 rounded-lg">
+                    <p class="font-semibold">⭐ ${r.rating} — ${r.username}</p>
+                    <p class="text-gray-700">${r.review}</p>
+                    <p class="text-xs text-gray-500">${r.created_at}</p>
+                  </div>
+                `;
+              });
+            }
+
+            loadUserRating(id);
+
+              modal.classList.remove("hidden");
+        } catch (error) {
+          console.error(error);
+          alert("Failed to load book details")
+        }
+      }
+
+
+
+      document.getElementById("btn-rate-modal").addEventListener("click", () => {
+        document.getElementById("rating-form").classList.remove("hidden");
+        initHalfStarRating(); //add baru
+      });
+
+      // submit
+ document.getElementById("rating-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const ratingInput = document.getElementById("user-rating").value;
+        const rating = ratingInput === "" ? null : parseFloat(ratingInput);
+        const review = document.getElementById("user-review").value;
+        const bookId = document.getElementById("details-modal").dataset.bookId;
+
+        const formData = new FormData();
+        //formData.append("user_id", currentUserId);
+        formData.append("book_id", bookId);
+        formData.append("rating", rating);
+        formData.append("review", review);
+
+        const res = await fetch("/tekweb_project/api/books/rate_book.php", {
+            method: "POST",
+            body: formData,
+        });
+
+        // const text = await res.text();
+        // console.log(text);
+        // console.log("Book ID: ", bookId);
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.message || "Failed to submit review");
+            return;
+        }
+
+        // After submit:
+        document.getElementById("rating-form").classList.add("hidden");
+        document.getElementById("btn-rate-modal").classList.add("hidden");
+        //document.getElementById("btn-rate-book").classList.add("hidden");
+
+        // Reload modal content
+        openDetailsModal(bookId);
+    });
+
+      // end
+
+
+
+      //disuru komen
+
+      // bookGrid.addEventListener("click", (e)=> {
+      //   const btn = e.target.closest(".btn-rate-book");
+      //   if(!btn) return;
+
+      //   const bookId = btn.dataset.bookId;
+
+      //   const modal = document.getElementById("details-modal");
+      //   modal.dataset.bookId = bookId;
+      //   modal.classList.remove("hidden");
+
+      //     loadUserRating(bookId);
+      //   }
+      // )
+
       // // --- CRUD CREATE
 //craye
-      form.addEventListener("submit", async function (e) {
+  form.addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const formData = new FormData(form);
@@ -470,7 +787,7 @@ if (!isset($_SESSION['user_id'])) {
   console.log(key, value);
 }
 
-  const res = await fetch("add_to_readlist.php", {
+  const res = await fetch("/tekweb_project/api/reading_list/add_to_readlist.php", {
     method: "POST",
     body: formData,
   });
@@ -493,7 +810,7 @@ editForm.addEventListener("submit", async function(e) {
   e.preventDefault();
   const formData = new FormData(editForm);
 
-  const res = await fetch("edit_status.php", {
+  const res = await fetch("/tekweb_project/api/reading_list/edit_status.php", {
     method: "POST",
     body: formData
   });
@@ -510,7 +827,7 @@ editForm.addEventListener("submit", async function(e) {
 
       // --- CRUD DELETE (Menggunakan Modal) ---
   async function deleteBook(id) {
-  const res = await fetch("deleteBook_readingList.php", {
+  const res = await fetch("/tekweb_project/api/reading_list/deleteBook_readingList.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id }),
@@ -570,7 +887,7 @@ editForm.addEventListener("submit", async function(e) {
 
   function closeModal(modalEl) {
     modalEl.classList.add("hidden");
-    form.reset();
+    //form.reset();
   }
 
 
@@ -614,10 +931,10 @@ editForm.addEventListener("submit", async function(e) {
         document.getElementById("penulisEdit").value = bookToEdit.author;
         document.getElementById("statusEdit").value = bookToEdit.status;
 
-        if (bookToEdit.book_cover) {
-          previewImg.src = bookToEdit.book_cover;
-          coverPreview.classList.remove("hidden");
-        }
+        // if (bookToEdit.book_cover) {
+        //   previewImg.src = bookToEdit.book_cover;
+        //   coverPreview.classList.remove("hidden");
+        // }
 
         openModal(editStatusModal);
       }
@@ -646,7 +963,7 @@ editForm.addEventListener("submit", async function(e) {
     return;
   }
 
-  const res = await fetch(`search_books.php?q=${encodeURIComponent(q)}`);
+  const res = await fetch(`/tekweb_project/api/books/search_books.php?q=${encodeURIComponent(q)}`);
   const books = await res.json();
 
   dropdown.innerHTML = "";
@@ -691,7 +1008,7 @@ editForm.addEventListener("submit", async function(e) {
 
           // Hapus penyorotan default
           const allButton = document.querySelector(
-            '.filter-btn[data-filter="Semua"]'
+            '.filter-btn[data-filter="all"]'
           );
           if (allButton) {
             allButton.classList.remove(
@@ -715,7 +1032,7 @@ editForm.addEventListener("submit", async function(e) {
         } else {
           // Logika default jika tidak ada filter di URL
           const allButton = document.querySelector(
-            '.filter-btn[data-filter="Semua"]'
+            '.filter-btn[data-filter="all"]'
           );
           if (allButton) {
             allButton.classList.add(
@@ -728,6 +1045,75 @@ editForm.addEventListener("submit", async function(e) {
 
         renderBooks();
       });
+
+
+
+
+
+
+      // init half star
+
+
+       function initHalfStarRating(containerId = "star-rating") {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const stars = container.querySelectorAll(".star");
+        const hiddenInput = container.querySelector("#user-rating");
+        const preview = container.querySelector("#rating-preview");
+
+        let lockedRating = 0;
+
+        function render(rating) {
+            stars.forEach(star => {
+                const value = parseInt(star.dataset.value);
+                const empty = star.querySelector(".star-empty");
+                const half = star.querySelector(".star-half");
+                const full = star.querySelector(".star-full");
+
+                empty.style.display = "block";
+                half.style.display = "none";
+                full.style.display = "none";
+
+                if (rating >= value) {
+                    empty.style.display = "none";
+                    full.style.display = "block";
+                } else if (rating === value - 0.5) {
+                    empty.style.display = "block";
+                    half.style.display = "block";
+                }
+            });
+
+            preview.textContent = `${rating.toFixed(1)} / 5.0`;
+        }
+
+        stars.forEach(star => {
+            const value = parseInt(star.dataset.value);
+
+            star.addEventListener("mousemove", e => {
+                const rect = star.getBoundingClientRect();
+                const isLeft = e.clientX < rect.left + rect.width / 2;
+                render(isLeft ? value - 0.5 : value);
+            });
+
+            star.addEventListener("mouseleave", () => {
+                render(lockedRating);
+            });
+
+            star.addEventListener("click", e => {
+                const rect = star.getBoundingClientRect();
+                const isLeft = e.clientX < rect.left + rect.width / 2;
+
+                lockedRating = isLeft ? value - 0.5 : value;
+                hiddenInput.value = lockedRating;
+                render(lockedRating);
+            });
+        });
+
+        render(0);
+    }
+
+
+
+
     </script>
-  </body>
-</html>

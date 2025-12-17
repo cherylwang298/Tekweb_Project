@@ -1,6 +1,8 @@
 <?php
 session_start();
-require_once "../../config/koneksi.php";
+require_once __DIR__ . "/../../config/koneksi.php";
+
+header("Content-Type: application/json");
 
 if (!isset($_SESSION['user_id'])) {
   http_response_code(401);
@@ -13,6 +15,7 @@ $user_id = $_SESSION['user_id'];
 $sql = "
 SELECT
   rl.id AS reading_id,
+  rl.book_id AS book_id,
   rl.status,
   rl.added_at,
   b.id AS book_id,
@@ -37,5 +40,4 @@ while ($row = $result->fetch_assoc()) {
   $books[] = $row;
 }
 
-header("Content-Type: application/json");
 echo json_encode($books);

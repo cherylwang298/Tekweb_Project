@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once "../../config/koneksi.php"; // koneksi ke database
+require_once __DIR__ . "/../../config/koneksi.php";
+
 header('Content-Type: application/json');
 
 // Pastikan request POST

@@ -1,7 +1,6 @@
 <?php
-session_start();
-include '../../config/koneksi.php';
-include '../partials/navbar.php';
+require_once "config/koneksi.php";
+include "partials/navbar.php";
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");

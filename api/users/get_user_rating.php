@@ -1,5 +1,6 @@
 <?php
-require_once "../../config/koneksi.php";
+require_once __DIR__ . "/../../config/koneksi.php";
+
 
 $user_id = $_GET["user_id"] ?? 0;
 $book_id = $_GET["book_id"] ?? 0;

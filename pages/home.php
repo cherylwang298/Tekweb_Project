@@ -1,9 +1,10 @@
 <?php
+
 require_once "config/koneksi.php";
 include "partials/navbar.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php?page=login");
+    header("Location: login.php");
     exit;
 }
 ?>
@@ -36,6 +37,40 @@ if (!isset($_SESSION['user_id'])) {
             }
         }
     </script>
+    <style>
+        .star {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .star i {
+            position: absolute;
+            inset: 0;
+            font-size: 1.75rem;
+            line-height: 1;
+        }
+
+        /* empty outline */
+        .star-empty {
+            color: #d1d5db;
+        }
+
+        /* half fill */
+        .star-half {
+            color: #facc15;
+            clip-path: inset(0 50% 0 0);
+            display: none;
+        }
+
+        /* full fill */
+        .star-full {
+            color: #facc15;
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="bg-primary-bg font-sans text-text-dark leading-relaxed">
@@ -126,8 +161,10 @@ if (!isset($_SESSION['user_id'])) {
             </div>
 
             <div class="mb-4">
-                <label class="font-semibold">Book Cover Image URL:</label>
-                <input id="cover-input" type="text" placeholder="https://..." class="w-full p-2 border border-light-gray rounded-md">
+                <label class="font-semibold">Book Cover Image:</label>
+                <!--<input id="cover-input" type="text" placeholder="https://..." class="w-full p-2 border border-light-gray rounded-md"> -->
+                <input id="cover-input" type="file" placeholder="" class="w-full p-2 border border-light-gray rounded-md">
+
             </div>
 
             <button class="bg-accent-dark text-white py-2 px-4 rounded-md font-semibold hover:bg-[#0E3C40] transition w-full" type="submit">
@@ -156,9 +193,14 @@ if (!isset($_SESSION['user_id'])) {
                     <i class="fas fa-star mr-1"></i> 5.0 / 5.0
                 </p>
                 
-                <button id="btn-rate-book" class="hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
+                <button id="btn-add-readinglist" onclick="addToReadingList(document.getElementById('details-modal').dataset.bookId)" class=" bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
+                    Add to Reading List
+                </button>
+
+                <button id="btn-rate-book" onclick="scrollToRating()" class="hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
                     Rate This Book
                 </button>
+
             </div>
         </div>
 
@@ -175,12 +217,45 @@ if (!isset($_SESSION['user_id'])) {
             <div class="flex flex-col md:flex-row gap-4 mb-4">
                 
                 <div class="flex-1">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-rating">Rating (1-5):</label>
-                    <input type="number" id="user-rating" min="0" max="5" step="0.5" placeholder="0.0 - 5.0"
-                        class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3" for="user-rating">Rating:</label>
+                    <!-- STAR RATING INPUT -->
+                    <div id="star-rating" class="flex flex-row items-center gap-2 md:flex-col md:items-start md:gap-1" >
+                        <input type="hidden" id="user-rating" required>
+
+                        <div class="flex">
+                            <div class="star" data-value="1">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="2">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="3">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="4">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                            <div class="star" data-value="5">
+                                <i class="far fa-star star-empty"></i>
+                                <i class="fas fa-star star-half"></i>
+                                <i class="fas fa-star star-full"></i>
+                            </div>
+                        </div>
+
+                        <span id="rating-preview" class="ml-2 md-mt-1 text-sm text-gray-600">
+                            0.0 / 5.0
+                        </span>
+                    </div>
                 </div>
-                
-                <div class="flex-1 md:flex-grow-[2]"> <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-review">Your Review:</label>
+                <div class="flex-1 md:flex-grow-[2]"> <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-review">Review:</label>
                     <textarea id="user-review" rows="3"
                             class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm resize-none"></textarea>
                 </div>
@@ -208,7 +283,7 @@ if (!isset($_SESSION['user_id'])) {
     ---------------------------------------------------- */
     async function loadBooks() {
         try {
-            const res = await fetch("get_books.php");
+            const res = await fetch("/tekweb_project/api/books/get_books.php");
             const books = await res.json();
             window.allBooks = books;
             renderBooks(books);
@@ -223,9 +298,10 @@ if (!isset($_SESSION['user_id'])) {
         const form = new FormData();
         for (const key in data) form.append(key, data[key]);
 
-        const res = await fetch("add_book.php", {
+        const res = await fetch("/tekweb_project/api/books/add_book.php", {
             method: "POST",
-            body: form
+            body: form,
+            credentials: "same-origin"
         });
 
         return res.json();
@@ -236,7 +312,7 @@ if (!isset($_SESSION['user_id'])) {
         const form = new FormData();
         for (const key in data) form.append(key, data[key]);
 
-        const res = await fetch("update_book.php", {
+        const res = await fetch("/tekweb_project/api/books/update_book.php", {
             method: "POST",
             body: form
         });
@@ -269,7 +345,11 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         books.forEach(book => {
-            const coverUrl = book.book_cover || 'images/default-book-cover.png';
+            //const coverUrl = book.book_cover || 'images/default-book-cover.png';
+            
+            const coverUrl = book.book_cover ? `/tekweb_project/${book.book_cover}` : '/tekweb_project/images/default-book-cover.png';
+            console.log(book.book_cover);
+
             container.innerHTML += `
                 <div class="group bg-white rounded-2xl p-5 shadow
                        transition-all duration-300 ease-out
@@ -278,7 +358,7 @@ if (!isset($_SESSION['user_id'])) {
                     onclick="handleBookClick(${book.id})">
                     <img src="${coverUrl}" alt="${book.title}"
                         class="w-full h-64 object-cover rounded-xl mb-3" 
-                        onerror="this.src='images/default-book-cover.png'">
+                        onerror="this.src='/tekweb_project/images/default-book-cover.png'">
 
                     <h3 class="font-bold text-lg">${book.title}</h3>
                     <p class="text-sm text-gray-600 mt-1">${book.author}</p>
@@ -352,87 +432,129 @@ if (!isset($_SESSION['user_id'])) {
     document.getElementById('book-form').addEventListener('submit', async e => {
         e.preventDefault();
 
-        const newBook = {
-            title: document.getElementById('title-input').value.trim(),
-            author: document.getElementById('author-input').value.trim(),
-            synopsis: document.getElementById('synopsis-input').value.trim(),
-            book_cover: document.getElementById('cover-input').value.trim()
-        };
+    const formData = new FormData();
+    formData.append("title", document.getElementById('title-input').value.trim());
+    formData.append("author", document.getElementById('author-input').value.trim());
+    formData.append("synopsis", document.getElementById('synopsis-input').value.trim());
 
-        // ✅ Validation for required fields
-        if (!newBook.title || !newBook.author) {
-            alert("Please fill in all required fields (Title and Author).");
-            return;
+    const coverInput = document.getElementById("cover-input");
+    if (coverInput.files.length > 0) {
+        formData.append("book_cover", coverInput.files[0]);
+    }
+
+    try {
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Adding...';
+
+        const res = await fetch("/tekweb_project/api/books/add_book.php", {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin"
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            alert(result.message || "Failed to add book");
+        } else {
+            e.target.reset();
+            document.getElementById('book-modal').classList.add('hidden');
+            await loadHome();
+            alert("Book added successfully!");
         }
 
-        // ✅ Check if allBooks exists and has data
-        if (!window.allBooks) {
-            window.allBooks = [];
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred. Please try again.");
+    }
+});
+
+
+   // ADD TO READING LIST
+async function addToReadingList(bookId, title = "", author = "", status = "to_read") {
+    try {
+        const formData = new FormData();
+        if (bookId) {
+            formData.append("book_id", bookId);
+        } else {
+            formData.append("judul", title);
+            formData.append("penulis", author);
+        }
+        formData.append("status", status);
+
+        const res = await fetch("/tekweb_project/api/reading_list/add_to_readlist.php", {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin"
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Book added to your reading list!");
+            // opsional: bisa update UI misal tombol disable atau teks berubah
+        } else {
+            alert(data.message || "Failed to add to reading list");
         }
 
-        // ✅ Prevent duplicates
-        const exists = window.allBooks.some(b =>
-            b.title.toLowerCase() === newBook.title.toLowerCase() &&
-            b.author.toLowerCase() === newBook.author.toLowerCase()
-        );
+        openDetailsModal(bookId);
+    } catch (err) {
+        console.error(err);
+        alert("An error occurred. Please try again.");
+    }
+}
 
-        if (exists) {
-            alert("This book already exists in the system.");
-            return;
-        }
 
-        try {
-            // ✅ Add loading state
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Adding...';
+    function scrollToRating() {
+        const modal = document.getElementById("details-modal");
+        modal.classList.remove("hidden"); // ensure visible
 
-            const result = await addBook(newBook);
+        requestAnimationFrame(() => {
+            const target = document.getElementById("rating-form");
+            if (!target) return;
 
-            if (result.success) {
-                // ✅ Success feedback
-                document.getElementById('book-form').reset();
-                modal.classList.add('hidden');
-                await loadHome(); // Reload books
-                alert("Book added successfully!");
-            } else {
-                alert(result.message || "Failed to add book. Please try again.");
-            }
-
-            // ✅ Restore button state
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-
-        } catch (error) {
-            console.error("Error adding book:", error);
-            alert("An error occurred. Please try again.");
-            
-            // Restore button state
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Add Book';
-        }
-    });
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        });
+    }
 
     // OPEN DETAIL MODAL
     async function openDetailsModal(id) {
         try {
-            const res = await fetch(`get_book_details.php?id=${id}`);
+            const res = await fetch(`/tekweb_project/api/books/get_book_details.php?id=${id}`);
             const data = await res.json();
+            
 
             if (data.error) {
                 alert(data.error);
                 return;
             }
 
+            
+
+            const coverImg = document.getElementById("details-cover");
+            coverImg.src = data.book_cover ? `/tekweb_project/${data.book_cover}` : "/tekweb_project/images/default-book-cover.png";
+            coverImg.onerror = () => {
+                coverImg.src = "/tekweb_project/images/default-book-cover.png";
+            }
+
             // Fill modal
-            document.getElementById("details-cover").src = data.book_cover || "images/default-book-cover.png";
+            //edit
+            //document.getElementById("details-cover").src = data.book_cover ? `../${data.book_cover}` : "../images/default-book-cover.png";
+            //end edit
             document.getElementById("details-title").textContent = data.title;
             document.getElementById("details-author").textContent = "By " + data.author;
 
-            document.getElementById("details-rating").textContent =
-                `⭐ ${parseFloat(data.avg_rating).toFixed(1)} / 5.0`;
+            document.getElementById("details-rating").innerHTML =
+                `<i class="fas fa-star mr-1"></i> ${parseFloat(data.avg_rating).toFixed(1)} / 5.0`;
+
 
             document.getElementById("details-synopsis").textContent =
                 data.synopsis?.trim() ? data.synopsis : "Synopsis not available.";
@@ -455,6 +577,7 @@ if (!isset($_SESSION['user_id'])) {
             }
 
             document.getElementById("details-modal").dataset.bookId = id;
+            await checkReadingList(id);
             await loadUserRating(id);
 
             document.getElementById("details-modal").classList.remove("hidden");
@@ -465,9 +588,10 @@ if (!isset($_SESSION['user_id'])) {
         }
     }
 
+
     // LOAD USER RATING
     async function loadUserRating(bookId) {
-        const res = await fetch(`get_user_rating.php?book_id=${bookId}&user_id=${currentUserId}`);
+        const res = await fetch(`/tekweb_project/api/users/get_user_rating.php?book_id=${bookId}&user_id=${currentUserId}`);
         const data = await res.json();
 
         const rateButton = document.getElementById("btn-rate-book");
@@ -489,8 +613,70 @@ if (!isset($_SESSION['user_id'])) {
     // USER CLICKS RATE -> SHOW FORM
     document.getElementById("btn-rate-book").addEventListener("click", () => {
         document.getElementById("rating-form").classList.remove("hidden");
+        initHalfStarRating(); // show star rating
     });
 
+    /* ----------------------------------------------------
+    HALF STAR RATING (REUSABLE)
+    ---------------------------------------------------- */
+    function initHalfStarRating(containerId = "star-rating") {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const stars = container.querySelectorAll(".star");
+        const hiddenInput = container.querySelector("#user-rating");
+        const preview = container.querySelector("#rating-preview");
+
+        let lockedRating = 0;
+
+        function render(rating) {
+            stars.forEach(star => {
+                const value = parseInt(star.dataset.value);
+                const empty = star.querySelector(".star-empty");
+                const half = star.querySelector(".star-half");
+                const full = star.querySelector(".star-full");
+
+                empty.style.display = "block";
+                half.style.display = "none";
+                full.style.display = "none";
+
+                if (rating >= value) {
+                    empty.style.display = "none";
+                    full.style.display = "block";
+                } else if (rating === value - 0.5) {
+                    empty.style.display = "block";
+                    half.style.display = "block";
+                }
+            });
+
+            preview.textContent = `${rating.toFixed(1)} / 5.0`;
+        }
+
+        stars.forEach(star => {
+            const value = parseInt(star.dataset.value);
+
+            star.addEventListener("mousemove", e => {
+                const rect = star.getBoundingClientRect();
+                const isLeft = e.clientX < rect.left + rect.width / 2;
+                render(isLeft ? value - 0.5 : value);
+            });
+
+            star.addEventListener("mouseleave", () => {
+                render(lockedRating);
+            });
+
+            star.addEventListener("click", e => {
+                const rect = star.getBoundingClientRect();
+                const isLeft = e.clientX < rect.left + rect.width / 2;
+
+                lockedRating = isLeft ? value - 0.5 : value;
+                hiddenInput.value = lockedRating;
+                render(lockedRating);
+            });
+        });
+
+        render(0);
+    }
 
     // SUBMITTING RATING / REVIEW
     document.getElementById("rating-form").addEventListener("submit", async (e) => {
@@ -507,7 +693,7 @@ if (!isset($_SESSION['user_id'])) {
         formData.append("rating", rating);
         formData.append("review", review);
 
-        const res = await fetch("rate_book.php", {
+        const res = await fetch("/tekweb_project/api/books/rate_book.php", {
             method: "POST",
             body: formData,
         });
@@ -527,7 +713,6 @@ if (!isset($_SESSION['user_id'])) {
         openDetailsModal(bookId);
     });
 
-
     // CLOSE MODAL BOOK DETAILS
     document.getElementById("close-details").onclick = () => document.getElementById("details-modal").classList.add("hidden");
 
@@ -536,6 +721,19 @@ if (!isset($_SESSION['user_id'])) {
             document.getElementById("details-modal").classList.add("hidden");
     };
 
+
+    async function checkReadingList(bookId) {
+    const res = await fetch(`/tekweb_project/api/reading_list/get_reading_list_status.php?book_id=${bookId}`);
+    const data = await res.json();
+
+    const btn = document.getElementById("btn-add-readinglist");
+
+    if (data.in_list) {
+        btn.classList.add("hidden");
+    } else {
+        btn.classList.remove("hidden");
+    }
+}
 
 </script>
 

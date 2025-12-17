@@ -1,6 +1,8 @@
 <?php
 session_start();
-require_once "../../config/koneksi.php";
+require_once __DIR__ . "/../../config/koneksi.php";
+
+
 
 // check user login
 if (!isset($_SESSION['user_id'])) {
