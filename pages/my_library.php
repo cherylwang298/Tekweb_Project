@@ -29,10 +29,13 @@ if (!isset($_SESSION['user_id'])) {
         theme: {
           extend: {
             colors: {
-              "primary-bg": "#FEFAF1",
-              "accent-dark": "#1D5C63",
-              "text-dark": "#333333",
-              "light-gray": "#EAEAEA",
+               'primary-bg': '#F7F4EB',
+                'accent-dark': '#52796F',
+               'text-dark': '#2F3E46',
+                'light-gray': '#E4E1D8',
+
+
+              
               success: "#3C763D",
               "success-bg": "#D6E7D2",
               info: "#0E3C40",
@@ -90,49 +93,92 @@ if (!isset($_SESSION['user_id'])) {
       rel="stylesheet"
     />
   </head>
-  <body class="font-sans bg-primary-bg text-text-dark leading-relaxed">
-    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+  
+<body class="bg-primary-bg font-sans text-text-dark min-h-screen relative overflow-x-hidden">
+
+<!-- BACKGROUND BLOBS -->
+<div class="fixed top-0 left-0 w-80 h-80 bg-[#B7D1C3] rounded-full blur-3xl opacity-40 -z-10"
+     style="animation: blobMove1 20s ease-in-out infinite;"></div>
+<div class="fixed bottom-0 right-0 w-[30rem] h-[30rem] bg-[#84A98C] rounded-full blur-3xl opacity-30 -z-10"
+     style="animation: blobMove2 26s ease-in-out infinite;"></div>
+<div class="fixed top-1/3 right-10 w-64 h-64 bg-[#E9EDC9] rounded-full blur-3xl opacity-30 -z-10"
+     style="animation: blobMove3 18s ease-in-out infinite;"></div>
+
+<div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
       
 
       <hr class="border-t border-light-gray mb-6 mt-0 sm:mt-0" />
 
-      <div class="pb-12">
-        <div
-          class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-6 space-y-4 sm:space-y-0"
-        >
-          <div id="status-filters" class="flex flex-wrap gap-2 sm:space-x-4">
-            <button
-              data-filter="all"
-              class="filter-btn text-xs sm:text-sm font-semibold py-1 px-3 rounded-full border border-transparent transition active-filter"
-            >
-              All
-            </button>
-            <button
-              data-filter="finished"
-              class="filter-btn text-xs sm:text-sm font-semibold py-1 px-3 rounded-full border border-transparent transition hover:border-accent-dark"
-            >
-              Finished
-            </button>
-            <button
-              data-filter="reading"
-              class="filter-btn text-xs sm:text-sm font-semibold py-1 px-3 rounded-full border border-transparent transition hover:border-accent-dark"
-            >
-              Currently Reading
-            </button>
-            <button
-              data-filter="to_read"
-              class="filter-btn text-xs sm:text-sm font-semibold py-1 px-3 rounded-full border border-transparent transition hover:border-accent-dark"
-            >
-              To Read
-            </button>
-          </div>
+     
 
-          <button
-            id="open-modal-btn"
-            >
-            
-          </button>
-        </div>
+    <!-- STATUS FILTER (STYLE SAMA DENGAN RATING FILTER) -->
+   
+  <div class="pb-8">
+  <div class="flex items-center mb-6">
+
+    <div
+      id="status-filters"
+      class="flex items-center gap-1.5
+             bg-white/60 backdrop-blur-md
+             p-2 rounded-2xl
+             border border-light-gray
+             shadow-sm"
+    >
+
+      <button
+        data-filter="all"
+        class="filter-btn
+               px-4 py-2.5 rounded-xl
+               text-sm font-bold
+               transition-all
+               bg-accent-dark text-white
+               hover:scale-105 active:scale-95">
+        All
+      </button>
+
+      <button
+        data-filter="to_read"
+        class="filter-btn
+               px-4 py-2.5 rounded-xl
+               text-sm font-bold
+               text-gray-500
+               hover:bg-white hover:text-accent-dark
+               transition-all
+               hover:scale-105 active:scale-95">
+        To Read
+      </button>
+
+      <button
+        data-filter="finished"
+        class="filter-btn
+               px-4 py-2.5 rounded-xl
+               text-sm font-bold
+               text-gray-500
+               hover:bg-white hover:text-accent-dark
+               transition-all
+               hover:scale-105 active:scale-95">
+        Finished
+      </button>
+
+      <button
+        data-filter="reading"
+        class="filter-btn
+               px-4 py-2.5 rounded-xl
+               text-sm font-bold
+               text-gray-500
+               hover:bg-white hover:text-accent-dark
+               transition-all
+               hover:scale-105 active:scale-95">
+        Currently Reading
+      </button>
+
+      
+
+    </div>
+  </div>
+</div>
+
 
         <main
           id="book-grid"
@@ -145,9 +191,11 @@ if (!isset($_SESSION['user_id'])) {
       id="book-modal"
       class="hidden fixed inset-0 z-10 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4"
     >
-      <div
-        class="bg-primary-bg p-6 sm:p-8 rounded-xl shadow-2xl w-full sm:w-11/12 max-w-lg transform duration-300 max-h-[90vh] overflow-y-auto"
-      >
+     <div class="bg-white/90 backdrop-blur-xl
+            rounded-[2.5rem] shadow-2xl
+            w-full max-w-3xl max-h-[85vh] overflow-y-auto
+            relative border border-white/40 p-8">
+
         <span
           class="close-btn text-gray-500 hover:text-gray-800 text-3xl font-bold float-right cursor-pointer"
           >&times;</span
@@ -218,186 +266,222 @@ if (!isset($_SESSION['user_id'])) {
   <!-- notif gabisa add soalnya ga ada di db -->
 </div>
 
-      <div
-      id="edit-status-modal"
-      class="hidden fixed inset-0 z-40 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4"
-    >
-      <div
-        class="bg-primary-bg p-6 sm:p-8 rounded-xl shadow-2xl w-full sm:w-11/12 max-w-lg transform duration-300 max-h-[90vh] overflow-y-auto"
-      >
-        <span
-          class="close-btn text-gray-500 hover:text-gray-800 text-3xl font-bold float-right cursor-pointer"
-          >&times;</span
-        >
-        <h2
-          id="modal-title"
-          class="font-serif text-xl sm:text-2xl text-accent-dark mb-4"
-        >
-          Edit Book Status
-        </h2>
+      
+      <div id="edit-status-modal"
+    class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4">
 
-        <form id="edit-status-form">
-          <input type="hidden" id="book-idEdit" name="id" />
-          <input type="hidden" id="book-id-selectedEdit" name="book_id">
+    <!-- BACKDROP -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
 
-          <div class="mb-4">
-            <label for="judul" class="block mb-1 font-semibold"
-              >Book Title:</label
-            >
-            <input
-              type="text"
-              id="judulEdit"
-              name="judul"
-              required
-              class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
-              readonly
-            />
-                <ul
-              id="title-dropdown"
-              class="border border-light-gray rounded-md bg-white hidden absolute z-50 w-full"
-            ></ul>
-          </div>
-          <div class="mb-4">
-            <label for="penulis" class="block mb-1 font-semibold"
-              >Author:</label
-            >
-            <input
-              type="text"
-              id="penulisEdit"
-              name="penulis"
-              required
-              class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
-              readonly
-              />
-          </div>
-          <div class="mb-4">
-            <label for="status" class="block mb-1 font-semibold">Status:</label>
-            <select
-              id="statusEdit"
-              name="status"
-              class="w-full p-2 border border-light-gray rounded-md box-border focus:ring-accent-dark focus:border-accent-dark"
-            >
-              <option value="to_read">To Read</option>
-              <option value="reading">Currently Reading</option>
-              <option value="finished">Finished</option>
-            </select>
-          </div>
+    <!-- MODAL -->
+    <div
+        class="relative
+               bg-white/90 backdrop-blur-xl
+               rounded-[2.5rem] shadow-2xl
+               w-full max-w-3xl max-h-[85vh] overflow-y-auto
+               border border-white/40">
 
-          <button
-            type="submit"
-            class="bg-accent-dark text-white py-3 px-4 rounded-md font-semibold text-lg w-full hover:bg-[#0E3C40] transition"
-          >
-            Update
-          </button>   
-        </form>  
-      </div>
+        <!-- CLOSE -->
+        <span class="close-btn
+            absolute right-6 top-6
+            text-gray-400 hover:text-gray-900
+            text-3xl cursor-pointer z-10">
+            &times;
+        </span>
+
+        <div class="p-8 lg:p-10">
+
+            <!-- HEADER -->
+            <div class="mb-8">
+                <h2 class="font-serif text-3xl font-extrabold mb-1">
+                    Edit Book Status
+                </h2>
+                <p class="text-gray-500 text-sm">
+                    Update your reading progress
+                </p>
+            </div>
+
+            <hr class="my-8 border-0 h-[2px]
+                bg-gradient-to-r from-transparent via-gray-300/80 to-transparent">
+
+            <!-- FORM (LOGIC TETAP) -->
+            <form id="edit-status-form"
+                class="bg-white/70 backdrop-blur-md
+                       border border-white/40
+                       rounded-2xl p-6">
+
+                <input type="hidden" id="book-idEdit" name="id">
+                <input type="hidden" id="book-id-selectedEdit" name="book_id">
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">
+                        Book Title
+                    </label>
+                    <input
+                        id="judulEdit"
+                        name="judul"
+                        readonly
+                        class="w-full p-3 rounded-xl border
+                               bg-gray-200 text-gray-600">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">
+                        Author
+                    </label>
+                    <input
+                        id="penulisEdit"
+                        name="penulis"
+                        readonly
+                        class="w-full p-3 rounded-xl border
+                               bg-gray-200 text-gray-600">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold mb-1">
+                        Status
+                    </label>
+                    <select
+                        id="statusEdit"
+                        name="status"
+                        class="w-full p-3 rounded-xl border
+                               focus:ring-2 focus:ring-accent-dark">
+                        <option value="to_read">To Read</option>
+                        <option value="reading">Currently Reading</option>
+                        <option value="finished">Finished</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end">
+                    <button
+                        type="submit"
+                        class="bg-accent-dark text-white
+                               px-6 py-2 rounded-xl font-bold
+                               transition-all hover:bg-accent-hover active:scale-95">
+                        Update
+                    </button>
+                </div>
+            </form>
+
+        </div>
     </div>
+</div>
+
 
     <!-- BOOK DETAILS MODAL -->
-     
-<div id="details-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-30">
-    <div class="bg-primary-bg rounded-2xl shadow-2xl w-full max-w-3xl h-[80vh] overflow-y-auto p-6 relative">
+     <div id="details-modal"
+    class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm
+           flex items-center justify-center p-4 z-[100]">
 
-        <span id="close-details" class="absolute right-6 top-3 text-gray-600 hover:text-gray-900 text-3xl cursor-pointer font-light" onclick="closeModal(document.getElementById('details-modal'))">&times;</span>
+    <div
+        class="bg-white/90 backdrop-blur-xl
+               rounded-[2.5rem] shadow-2xl
+               w-full max-w-3xl max-h-[85vh] overflow-y-auto
+               relative border border-white/40">
 
-        <div class="flex flex-col sm:flex-row gap-6 mb-6">
-            
-            <div class="flex-shrink-0 w-full sm:w-1/3 max-w-[200px] mx-auto sm:mx-0">
-                <img id="details-cover" class="w-full h-80 object-cover rounded-xl shadow-lg" alt="Book Cover">
-            </div>
+        <!-- CLOSE -->
+        <span id="close-details" class="absolute right-6 top-3 text-gray-600 hover:text-gray-900 text-3xl cursor-pointer font-light" 
+        onclick="closeModal(document.getElementById('details-modal'))">&times;</span>
 
-            <div class="flex-grow pt-4">
-                <h2 id="details-title" class="font-serif text-3xl font-bold text-accent-dark mb-1"></h2>
-                <p id="details-author" class="text-lg text-gray-700 mb-3">By </p>
-                <p id="details-rating" class="font-semibold text-xl text-yellow-600 mb-6 flex items-center">
-                    <i class="fas fa-star mr-1"></i> 5.0 / 5.0
-                </p>
+        <div class="p-8 lg:p-10">
+
+            <!-- HEADER -->
+            <div class="flex flex-col md:flex-row gap-8 mb-8">
                 
-                <!-- btn-rate-book -->
-                <button id="btn-rate-modal" class=" hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
-                    Rate This Book
-                </button>
-            </div>
-        </div>
+                <!-- COVER -->
+                <img id="details-cover"
+                    class="w-full md:w-48 aspect-[3/4]
+                           object-cover rounded-2xl shadow-lg"
+                    alt="Book Cover">
 
-        <hr class="border-t border-light-gray my-6">
+                <!-- INFO -->
+                <div class="flex-grow">
 
-        <h3 class="font-serif text-xl font-bold text-accent-dark mb-2">Synopsis</h3>
-        <p id="details-synopsis" class="text-gray-700 mb-8 leading-relaxed"></p>
-
-        <h3 class="font-serif text-xl font-bold text-accent-dark mb-4">Reviews</h3>
-        
-        <form id="rating-form" class="bg-light-gray p-6 rounded-xl shadow-inner mb-8 border border-gray-200">
-            <h4 class="font-serif text-xl font-bold text-accent-dark mb-4">Add Your Rating & Review</h4>
-            
-            <div class="flex flex-col md:flex-row gap-4 mb-4">
-                
-                <div class="flex-1">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-rating">Rating (1-5):</label>
-                    <!-- <input type="number" id="user-rating" min="0" max="5" step="0.5" placeholder="0.0 - 5.0"
-                        class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm"> -->
-
-                        <!-- input star -->
-
-                          <div class="flex-1">
-                    <label class="block text-sm font-semibold text-gray-700 mb-3" for="user-rating">Rating:</label>
-                    <!-- STAR RATING INPUT -->
-                    <div id="star-rating" class="flex flex-row items-center gap-2 md:flex-col md:items-start md:gap-1" >
-                        <input type="hidden" id="user-rating" required>
-
-                        <div class="flex">
-                            <div class="star" data-value="1">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                            <div class="star" data-value="2">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                            <div class="star" data-value="3">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                            <div class="star" data-value="4">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                            <div class="star" data-value="5">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                        </div>
-
-                        <span id="rating-preview" class="ml-2 md-mt-1 text-sm text-gray-600">
-                            0.0 / 5.0
-                        </span>
+                    <!-- AVG RATING -->
+                    <div id="details-rating"
+                        class="inline-flex items-center gap-1
+                               px-4 py-1.5
+                               bg-yellow-400/10 text-yellow-700
+                               rounded-full text-sm font-bold mb-3">
+                        <i class="fas fa-star"></i> 0.0 / 5.0
                     </div>
-                </div>
 
-                <!-- input end -->
+                    <h2 id="details-title"
+                        class="font-serif text-3xl font-extrabold mb-1">
+                    </h2>
 
-                </div>
-                
-                <div class="flex-1 md:flex-grow-[2]"> <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-review">Your Review:</label>
-                    <textarea id="user-review" rows="3"
-                            class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm resize-none"></textarea>
+                    <p id="details-author"
+                        class="text-lg text-gray-500 font-medium mb-5">
+                    </p>
+
+
+                        <button id="btn-rate-modal"
+                            class="hidden bg-accent-dark text-white
+                                   py-2.5 px-6 rounded-xl
+                                   font-bold">
+                            Rate This Book
+                        </button>
+                  
                 </div>
             </div>
-            
-            <button type="submit" class="bg-accent-dark text-white py-2 px-6 rounded-md font-semibold hover:bg-[#0E3C40] transition shadow-md">
-                Submit Review
-            </button>
-        </form>
 
-        <div id="details-reviews" class="space-y-4 mx-3"></div>
+            <!-- DIVIDER -->
+            <hr class="my-10 border-0 h-[2px]
+                       bg-gradient-to-r
+                       from-transparent via-gray-300/80 to-transparent">
 
+            <!-- SYNOPSIS -->
+            <h3 class="font-serif text-xl font-bold mb-2">Synopsis</h3>
+            <p id="details-synopsis"
+                class="text-gray-600 leading-relaxed mb-8">
+            </p>
+
+            <!-- REVIEWS -->
+            <h3 class="font-serif text-xl font-bold mb-3">Reviews</h3>
+            <div id="details-reviews" class="space-y-4 mb-10"></div>
+
+            <!-- RATING FORM -->
+            <form id="rating-form"
+                class="hidden bg-white/70 backdrop-blur-md
+                       border border-white/40
+                       rounded-2xl p-6">
+
+                <div id="star-rating" class="flex gap-1 mb-3">
+                    <input type="hidden" id="user-rating" required>
+
+                    <?php for ($i=1;$i<=5;$i++): ?>
+                    <div class="star" data-value="<?= $i ?>">
+                        <i class="far fa-star star-empty"></i>
+                        <i class="fas fa-star star-half"></i>
+                        <i class="fas fa-star star-full"></i>
+                    </div>
+                    <?php endfor; ?>
+                </div>
+
+                <span id="rating-preview"
+                    class="block text-sm text-gray-600 mb-3">
+                    Give your rating and review!
+                </span>
+
+                <textarea id="user-review"
+                    rows="3"
+                    class="w-full p-3 border rounded-xl mb-4 resize-none">
+                </textarea>
+
+                <div class="flex justify-end">
+                    <button type="submit"
+                        class="bg-accent-dark text-white
+                               px-6 py-2 rounded-xl
+                               font-bold transition-all
+                               hover:bg-accent-hover active:scale-95">
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+
+        </div>
     </div>
- </div> 
+</div>
 
 
     <div
@@ -443,6 +527,8 @@ if (!isset($_SESSION['user_id'])) {
 
 
     <script>
+
+      let currentFilter = "all";
       // DOM Elements
       const bookGrid = document.getElementById("book-grid");
       const bookModal = document.getElementById("book-modal");
@@ -472,7 +558,7 @@ if (!isset($_SESSION['user_id'])) {
       //   mobileMenu.classList.toggle("hidden");
       // });
 
-      let currentFilter = "all";
+      
       let bookIdToDelete = null;
 
       function showToast(message, type = "error") {
@@ -622,7 +708,14 @@ if (!isset($_SESSION['user_id'])) {
                console.log("book: ", book.title, "Cover:", coverSrc);
 
     bookGrid.innerHTML += `
-      <div class="bg-white rounded-lg shadow-md p-5 flex flex-col" onclick="openDetailsModal(${book.book_id})">
+      <div
+  class="group relative bg-white/70 backdrop-blur-sm
+         rounded-[2rem] p-5 shadow
+         transition-all duration-300 ease-out
+         hover:-translate-y-2 hover:shadow-2xl
+         active:scale-95 cursor-pointer"
+  onclick="openDetailsModal(${book.book_id})">
+
         <div class="text-xs font-semibold px-3 py-1 rounded-md w-fit ${statusClasses}">
           ${displayStatus(book.status)}
         </div>
@@ -640,7 +733,10 @@ if (!isset($_SESSION['user_id'])) {
         </p>
 
         <div class="mt-auto mx-auto pt-3 flex gap-3">
-          <button onclick="openEditModal(${book.reading_id}); event.stopPropagation()"
+        ${book.status === "finished"
+            ? `<span class="text-gray-400 italic text-sm">Book finished.</span>`
+            : `
+              <button onclick="openEditModal(${book.reading_id}); event.stopPropagation()"
             class="text-gray-500 hover:text-accent-dark transition mr-3">
               <i class="fas fa-pencil-alt text-sm"></i>
             Edit
@@ -651,8 +747,10 @@ if (!isset($_SESSION['user_id'])) {
              <i class="fas fa-trash-alt text-sm"></i>
             Delete
           </button>
+            `
+        }
+      </div>
 
-                </div>
       </div>
     `;
   });
@@ -726,7 +824,9 @@ if (!isset($_SESSION['user_id'])) {
             } else {
               data.reviews.forEach(r => {
                 reviewContainer.innerHTML += `
-                  <div class="border p-3 rounded-lg">
+                  <div class="bg-white/60 backdrop-blur-md
+            p-4 rounded-2xl border border-white/50 shadow-sm">
+
                     <p class="font-semibold">⭐ ${r.rating} — ${r.username}</p>
                     <p class="text-gray-700">${r.review}</p>
                     <p class="text-xs text-gray-500">${r.created_at}</p>
@@ -894,25 +994,52 @@ editForm.addEventListener("submit", async function(e) {
 
 
   // Filtering sesuai status
-  filterBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      filterBtns.forEach((b) =>
-        b.classList.remove(
-          "active-filter",
-          "border-accent-dark",
-          "bg-accent-dark/10"
-        )
-      );
-      this.classList.add(
-        "active-filter",
-        "border-accent-dark",
-        "bg-accent-dark/10"
-      );
+  filterBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.filter;
 
-      currentFilter = this.dataset.filter;
-      renderBooks();
-    });
+    history.replaceState(
+      null,
+      "",
+      `index.php?page=my_library&status=${currentFilter}`
+    );
+
+    setActiveFilterButton(currentFilter);
+    renderBooks();
   });
+});
+
+
+
+function setActiveFilterButton(filter) {
+  filterBtns.forEach(btn => {
+    const isActive = btn.dataset.filter === filter;
+
+    btn.classList.toggle("bg-accent-dark", isActive);
+    btn.classList.toggle("text-white", isActive);
+
+    btn.classList.toggle("text-gray-500", !isActive);
+  });
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const statusFromUrl = getUrlParameter("status");
+
+  // default state
+  currentFilter = "all";
+
+  if (statusFromUrl && ["finished", "reading", "to_read"].includes(statusFromUrl)) {
+    currentFilter = statusFromUrl;
+  }
+
+  // update UI tab
+  setActiveFilterButton(currentFilter);
+
+  // render langsung sesuai state
+  renderBooks();
+});
+
 
   // Buka tutup modal
   function openModal(modalEl) {
@@ -924,25 +1051,45 @@ editForm.addEventListener("submit", async function(e) {
     //form.reset();
   }
 
+  // CLOSE MODAL VIA X BUTTON
+document.getElementById("close-details").addEventListener("click", () => {
+    document.getElementById("details-modal").classList.add("hidden");
+    document.body.classList.remove("overflow-hidden");
+});
+
+// CLOSE MODAL WHEN CLICKING OUTSIDE CONTENT
+document.getElementById("details-modal").addEventListener("click", (e) => {
+    if (e.target.id === "details-modal") {
+        e.currentTarget.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+    }
+});
+
+
 
   //ini buka tutup modal function:
       // Add Book modal (open)
       openModalBtn.addEventListener("click", () => openCreateModal());
 
       // Tutup modal ------> buat fungsi buat semua modal sekalian
-      closeBtns.forEach((btn) =>
-        btn.addEventListener("click", () => {
-          closeModal(bookModal);
-          closeModal(deleteModal);
-          closeModal(editStatusModal);
-        })
-      );
+      document.querySelectorAll(".close-btn").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    const modal = btn.closest('[id$="modal"]');
+    if (modal) closeModal(modal);
+  });
+});
 
-      window.addEventListener("click", (event) => {
-        if (event.target == bookModal) closeModal(bookModal);
-        if (event.target == editStatusModal) closeModal(editStatusModal);
-        if (event.target == deleteModal) closeModal(deleteModal);
-      });
+
+
+      
+
+      document.querySelectorAll('[id$="modal"]').forEach(modal => {
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeModal(modal);
+    }
+  });
+});
 
       // Modal Tambah (CREATE)
       function openCreateModal() {
@@ -1146,6 +1293,18 @@ editForm.addEventListener("submit", async function(e) {
 
         render(0);
     }
+
+    function getUrlParameter(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+} 
+
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.querySelectorAll('[id$="modal"]').forEach(m => closeModal(m));
+  }
+});
 
 
 

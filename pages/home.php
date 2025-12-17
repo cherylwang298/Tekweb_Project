@@ -1,10 +1,9 @@
 <?php
-
 require_once "config/koneksi.php";
 include "partials/navbar.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: index.php?page=login");
     exit;
 }
 ?>
@@ -12,264 +11,260 @@ if (!isset($_SESSION['user_id'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblios - Home</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biblios - Home</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-bg': '#FEFAF1',
-                        'accent-dark': '#1D5C63',
-                        'text-dark': '#333333',
-                        'light-gray': '#EAEAEA'
-                    },
-                    fontFamily: {
-                        'serif': ['Playfair Display', 'serif'],
-                        'sans': ['Inter', 'sans-serif'],
-                    },
-                }
-            }
+<script>
+tailwind.config = {
+    theme: {
+        extend: {
+            colors: {
+                'primary-bg': '#F7F4EB',
+                'accent-dark': '#52796F',
+                'accent-hover': '#354F52',
+                'text-dark': '#2F3E46',
+                'light-gray': '#E4E1D8'
+            },
+            fontFamily: {
+                'serif': ['Playfair Display', 'serif'],
+                'sans': ['Inter', 'sans-serif'],
+            },
         }
-    </script>
-    <style>
-        .star {
-            position: relative;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            display: inline-block;
-        }
+    }
+}
+</script>
 
-        .star i {
-            position: absolute;
-            inset: 0;
-            font-size: 1.75rem;
-            line-height: 1;
-        }
+<style>
+@keyframes blobMove1 {
+    0% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(60px, -40px) scale(1.1); }
+    50% { transform: translate(-40px, 50px) scale(0.95); }
+    75% { transform: translate(50px, 30px) scale(1.05); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes blobMove2 {
+    0% { transform: translate(0, 0) scale(1); }
+    30% { transform: translate(-70px, 40px) scale(1.15); }
+    60% { transform: translate(40px, -60px) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes blobMove3 {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-80px) scale(1.1); }
+    100% { transform: translateY(0) scale(1); }
+}
 
-        /* empty outline */
-        .star-empty {
-            color: #d1d5db;
-        }
+.star { position: relative; width: 32px; height: 32px; cursor: pointer; }
+.star i { position: absolute; inset: 0; font-size: 1.75rem; }
+.star-empty { color: #d1d5db; }
+.star-half { color: #facc15; clip-path: inset(0 50% 0 0); display: none; }
+.star-full { color: #facc15; display: none; }
 
-        /* half fill */
-        .star-half {
-            color: #facc15;
-            clip-path: inset(0 50% 0 0);
-            display: none;
-        }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
 
-        /* full fill */
-        .star-full {
-            color: #facc15;
-            display: none;
-        }
-    </style>
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
 </head>
 
-<body class="bg-primary-bg font-sans text-text-dark leading-relaxed">
+<body class="bg-primary-bg font-sans text-text-dark min-h-screen relative overflow-x-hidden">
 
-<div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+<!-- BACKGROUND BLOBS -->
+<div class="fixed top-0 left-0 w-80 h-80 bg-[#B7D1C3] rounded-full blur-3xl opacity-40 -z-10"
+     style="animation: blobMove1 20s ease-in-out infinite;"></div>
+<div class="fixed bottom-0 right-0 w-[30rem] h-[30rem] bg-[#84A98C] rounded-full blur-3xl opacity-30 -z-10"
+     style="animation: blobMove2 26s ease-in-out infinite;"></div>
+<div class="fixed top-1/3 right-10 w-64 h-64 bg-[#E9EDC9] rounded-full blur-3xl opacity-30 -z-10"
+     style="animation: blobMove3 18s ease-in-out infinite;"></div>
 
-    <hr class="border-t border-light-gray mb-6">
+<div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-    <!-- SEARCH + FILTER + ADD -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-10 mb-6 mx-5">
-
-        <div class="flex items-center w-full sm:w-3/4 gap-4">
-            <div class="flex-grow">
-                <div class="relative">
-                    <input id="search-input" type="text" placeholder="Search by title or author..." 
-                        class="w-full p-2 border border-light-gray rounded-md focus:ring-accent-dark focus:border-accent-dark shadow-sm pr-10">
-                    
-                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                </div>
-            </div>
-
-            <div id="rating-filter" class="flex items-center gap-2 bg-white border border-light-gray rounded-xl p-1 shadow-sm">
-                <button data-rating="all" class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
-                        bg-accent-dark text-white transition">
-                    All</button>
-
-                <button data-rating="1"
-                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
-                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
-                    ★</button>
-
-                <button data-rating="2"
-                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
-                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
-                    ★★</button>
-
-                <button data-rating="3"
-                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
-                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
-                    ★★★</button>
-
-                <button data-rating="4"
-                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
-                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
-                    ★★★★</button>
-
-                <button data-rating="5"
-                    class="rating-btn px-3 py-1.5 rounded-lg text-sm font-semibold
-                        text-gray-500 hover:bg-accent-dark/10 hover:text-accent-dark transition">
-                    ★★★★★</button>
-            </div>  
-        </div>
-
-        <!-- Add Book Button -->
-        <button id="open-modal-btn" class="bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition w-full sm:w-auto">
-            + Add New Book
-        </button>
+    <!-- HEADER -->
+    <div class="mt-10 mb-8 animate-fade-in">
+        <h1 class="font-serif text-3xl text-accent-dark font-extrabold tracking-tight">Discover new books!</h1>
+        <p class="text-gray-500 font-medium mt-1">Explore our collection and share your thoughts.</p>
     </div>
 
+    <!-- SEARCH / FILTER / ADD -->
+    <div class="flex flex-col lg:flex-row items-center gap-4 mb-10 animate-fade-in">
+    
+    <div class="relative w-full lg:flex-1 group transition-all duration-300 hover:-translate-y-1">
+        <input id="search-input" type="text" placeholder="Search by title or author..."
+            class="w-full pl-12 pr-4 py-3 bg-white/80 border border-light-gray rounded-2xl focus:ring-2 focus:ring-accent-dark outline-none shadow-sm transition-all group-hover:shadow-md group-hover:border-accent-dark/30">
+        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 transition-colors group-hover:text-accent-dark"></i>
+    </div>
+
+    <div id="rating-filter" class="flex shrink-0 items-center gap-1 bg-white/60 p-1.5 rounded-2xl border border-light-gray shadow-sm transition-all hover:shadow-md">
+        <button data-rating="all"
+            class="rating-btn px-4 py-2 rounded-xl text-xs font-bold bg-accent-dark text-white transition-all hover:scale-105 active:scale-95 shadow-sm">
+            All
+        </button>
+        <button data-rating="1" class="rating-btn px-3 py-2 rounded-xl text-xs font-bold text-gray-500 hover:bg-white hover:text-accent-dark hover:scale-110 transition-all active:scale-90">★</button>
+        <button data-rating="2" class="rating-btn px-3 py-2 rounded-xl text-xs font-bold text-gray-500 hover:bg-white hover:text-accent-dark hover:scale-110 transition-all active:scale-90">★★</button>
+        <button data-rating="3" class="rating-btn px-3 py-2 rounded-xl text-xs font-bold text-gray-500 hover:bg-white hover:text-accent-dark hover:scale-110 transition-all active:scale-90">★★★</button>
+        <button data-rating="4" class="rating-btn px-3 py-2 rounded-xl text-xs font-bold text-gray-500 hover:bg-white hover:text-accent-dark hover:scale-110 transition-all active:scale-90">★★★★</button>
+        <button data-rating="5" class="rating-btn px-3 py-2 rounded-xl text-xs font-bold text-gray-500 hover:bg-white hover:text-accent-dark hover:scale-110 transition-all active:scale-90">★★★★★</button>
+    </div>
+
+    <button id="open-modal-btn"
+        class="bg-accent-dark text-white py-3 px-6 rounded-xl font-bold text-sm hover:bg-accent-hover transition-all shadow-md hover:shadow-lg hover:-translate-y-1 active:scale-95 w-full lg:w-auto whitespace-nowrap flex items-center justify-center gap-2">
+        <i class="fas fa-plus transition-transform group-hover:rotate-90"></i> 
+        <span>Add New Book</span>
+    </button>
+</div>
+
     <!-- BOOK GRID -->
-    <div class="font-sans text-3xl font-bold mt-10 mb-5">Discover new books!</div>
-    <main id="book-grid" class="grid gap-8 mx-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></main>
+    <main id="book-grid"
+        class="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-20"></main>
 
 </div>
 
 <!-- ADD BOOK MODAL -->
-<div id="book-modal" class="hidden fixed inset-0 !bg-black/50 flex items-center justify-center p-4 z-20">
-    <!-- Modal Card -->
-    <div class="bg-primary-bg rounded-lg p-8 shadow-2xl w-11/12 max-w-lg max-h-full lg:max-h-[85vh] overflow-y-auto">
+<div id="book-modal"
+    class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
+    <div class="bg-white rounded-[2rem] p-8 shadow-2xl w-full max-w-lg relative border border-light-gray">
+        <span id="close-modal"
+            class="absolute right-6 top-5 text-gray-400 hover:text-gray-800 text-3xl cursor-pointer">&times;</span>
 
-        <span id="close-modal" class="text-gray-500 hover:text-gray-800 text-3xl font-bold float-right cursor-pointer">&times;</span>
-        <h2 class="font-serif text-2xl text-accent-dark mb-4">Add New Book</h2>
+        <h2 class="font-serif text-2xl font-bold text-accent-dark mb-6">Add New Book</h2>
 
-        <form id="book-form">
-            <div class="mb-4">
-                <label class="font-semibold">Title:</label>
-                <input id="title-input" required type="text" class="w-full p-2 border border-light-gray rounded-md">
-            </div>
-
-            <div class="mb-4">
-                <label class="font-semibold">Author:</label>
-                <input id="author-input" required type="text" class="w-full p-2 border border-light-gray rounded-md">
-            </div>
-
-            <div class="mb-4">
-                <label class="font-semibold">Synopsis:</label>
-                <textarea id="synopsis-input" rows="3" class="w-full p-2 border border-light-gray rounded-md"></textarea>
-            </div>
-
-            <div class="mb-4">
-                <label class="font-semibold">Book Cover Image:</label>
-                <!--<input id="cover-input" type="text" placeholder="https://..." class="w-full p-2 border border-light-gray rounded-md"> -->
-                <input id="cover-input" type="file" placeholder="" class="w-full p-2 border border-light-gray rounded-md">
-
-            </div>
-
-            <button class="bg-accent-dark text-white py-2 px-4 rounded-md font-semibold hover:bg-[#0E3C40] transition w-full" type="submit">
+        <form id="book-form" class="space-y-4">
+            <input id="title-input" required placeholder="Title"
+                class="w-full p-3 bg-gray-50 border rounded-xl">
+            <input id="author-input" required placeholder="Author"
+                class="w-full p-3 bg-gray-50 border rounded-xl">
+            <textarea id="synopsis-input" rows="3" placeholder="Synopsis"
+                class="w-full p-3 bg-gray-50 border rounded-xl resize-none"></textarea>
+            <input id="cover-input" type="file"
+                class="w-full text-sm text-gray-500">
+            <button type="submit"
+                class="bg-accent-dark text-white py-4 rounded-xl font-bold w-full">
                 Add Book
             </button>
         </form>
     </div>
 </div>
 
-<!-- BOOK DETAILS MODAL -->
-<div id="details-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-30">
-    <div class="bg-primary-bg rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative">
+<!-- DETAILS MODAL -->
+<!-- DETAILS MODAL (SAFE VERSION) -->
+<div id="details-modal"
+    class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[70]">
 
-        <span id="close-details" class="absolute right-6 top-3 text-gray-600 hover:text-gray-900 text-3xl cursor-pointer font-light">&times;</span>
+    <div
+        class="bg-white/90 backdrop-blur-xl
+               rounded-[2.5rem] shadow-2xl
+               w-full max-w-3xl max-h-[85vh] overflow-y-auto
+               relative border border-white/40">
 
-        <div class="flex flex-col sm:flex-row gap-6 mb-6">
-            
-            <div class="flex-shrink-0 w-full sm:w-1/3 max-w-[200px] mx-auto sm:mx-0">
-                <img id="details-cover" class="w-full h-80 object-cover rounded-xl shadow-lg" alt="Book Cover">
-            </div>
+        <!-- CLOSE -->
+        <span id="close-details"
+            class="absolute right-6 top-6 text-gray-400 hover:text-gray-900 text-3xl cursor-pointer">
+            &times;
+        </span>
 
-            <div class="flex-grow pt-4">
-                <h2 id="details-title" class="font-serif text-3xl font-bold text-accent-dark mb-1"></h2>
-                <p id="details-author" class="text-lg text-gray-700 mb-3">By </p>
-                <p id="details-rating" class="font-semibold text-xl text-yellow-600 mb-6 flex items-center">
-                    <i class="fas fa-star mr-1"></i> 5.0 / 5.0
-                </p>
-                
-                <button id="btn-add-readinglist" onclick="addToReadingList(document.getElementById('details-modal').dataset.bookId)" class=" bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
-                    Add to Reading List
-                </button>
+        <div class="p-8 lg:p-10">
 
-                <button id="btn-rate-book" onclick="scrollToRating()" class="hidden bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition">
-                    Rate This Book
-                </button>
+            <!-- HEADER -->
+            <div class="flex flex-col md:flex-row gap-8 mb-8">
+                <img id="details-cover"
+                    class="w-full md:w-48 aspect-[3/4] object-cover rounded-2xl shadow-lg">
 
-            </div>
-        </div>
+                <div class="flex-grow">
 
-        <hr class="border-t border-light-gray my-6">
-
-        <h3 class="font-serif text-xl font-bold text-accent-dark mb-2">Synopsis</h3>
-        <p id="details-synopsis" class="text-gray-700 mb-8 leading-relaxed"></p>
-
-        <h3 class="font-serif text-xl font-bold text-accent-dark mb-4">Reviews</h3>
-        
-        <form id="rating-form" class="bg-light-gray p-6 rounded-xl shadow-inner mb-8 border border-gray-200">
-            <h4 class="font-serif text-xl font-bold text-accent-dark mb-4">Add Your Rating & Review</h4>
-            
-            <div class="flex flex-col md:flex-row gap-4 mb-4">
-                
-                <div class="flex-1">
-                    <label class="block text-sm font-semibold text-gray-700 mb-3" for="user-rating">Rating:</label>
-                    <!-- STAR RATING INPUT -->
-                    <div id="star-rating" class="flex flex-row items-center gap-2 md:flex-col md:items-start md:gap-1" >
-                        <input type="hidden" id="user-rating" required>
-
-                        <div class="flex">
-                            <div class="star" data-value="1">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                            <div class="star" data-value="2">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                            <div class="star" data-value="3">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                            <div class="star" data-value="4">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                            <div class="star" data-value="5">
-                                <i class="far fa-star star-empty"></i>
-                                <i class="fas fa-star star-half"></i>
-                                <i class="fas fa-star star-full"></i>
-                            </div>
-                        </div>
-
-                        <span id="rating-preview" class="ml-2 md-mt-1 text-sm text-gray-600">
-                            0.0 / 5.0
-                        </span>
+                    <!-- 🔴 INI HARUS ADA & TIDAK DIUBAH -->
+                    <div id="details-rating"
+                        class="inline-flex items-center px-4 py-1.5
+                               bg-yellow-400/10 text-yellow-700
+                               rounded-full text-sm font-bold mb-3">
+                        <i class="fas fa-star mr-1"></i> 0.0 / 5.0
                     </div>
-                </div>
-                <div class="flex-1 md:flex-grow-[2]"> <label class="block text-sm font-semibold text-gray-700 mb-1" for="user-review">Review:</label>
-                    <textarea id="user-review" rows="3"
-                            class="w-full p-3 border border-light-gray rounded-lg focus:ring-accent-dark focus:border-accent-dark transition shadow-sm resize-none"></textarea>
+
+                    <h2 id="details-title"
+                        class="font-serif text-3xl font-extrabold mb-1"></h2>
+
+                    <p id="details-author"
+                        class="text-lg text-gray-500 font-medium mb-5"></p>
+
+                    <!-- 🔴 TOMBOL LAMA HARUS ADA -->
+                    <button id="btn-add-readinglist"
+                        class="bg-accent-dark text-white py-2.5 px-6
+                               rounded-xl font-bold mb-3">
+                        Add to Reading List
+                    </button>
+
+                    <button id="btn-rate-book"
+                        class="hidden bg-accent-dark text-white py-2.5 px-6
+                               rounded-xl font-bold">
+                        Rate This Book
+                    </button>
+
                 </div>
             </div>
-            
-            <button type="submit" class="bg-accent-dark text-white py-2 px-6 rounded-md font-semibold hover:bg-[#0E3C40] transition shadow-md">
-                Submit Review
-            </button>
-        </form>
 
-        <div id="details-reviews" class="space-y-4 mx-3"></div>
+            <hr class="my-10 border-0 h-[2px] bg-gradient-to-r from-transparent via-gray-300/80 to-transparent">
 
+
+
+            <!-- SYNOPSIS -->
+            <h3 class="font-serif text-xl font-bold mb-2">Synopsis</h3>
+            <p id="details-synopsis"
+                class="text-gray-600 leading-relaxed mb-8"></p>
+
+            <!-- REVIEWS -->
+            <h3 class="font-serif text-xl font-bold mb-3">Reviews</h3>
+            <div id="details-reviews" class="space-y-4 mb-10"></div>
+
+            <!-- 🔴 FORM HARUS TETAP STRUKTURNYA -->
+            <form id="rating-form"
+                class="hidden bg-white/70 backdrop-blur-md
+                       border border-white/40
+                       rounded-2xl p-6">
+
+
+                <div id="star-rating" class="flex gap-1 mb-3">
+                    <input type="hidden" id="user-rating" required>
+                    <?php for ($i=1;$i<=5;$i++): ?>
+                    <div class="star" data-value="<?= $i ?>">
+                        <i class="far fa-star star-empty"></i>
+                        <i class="fas fa-star star-half"></i>
+                        <i class="fas fa-star star-full"></i>   
+                    </div>
+                    <?php endfor; ?>
+                </div>
+                    <span id="rating-preview"
+                    class="block text-sm text-gray-600 mb-3"> Give your rating and review!
+                </span> 
+                
+
+                <textarea id="user-review"
+                    class="w-full p-3 border rounded-xl mb-4"
+                    rows="3"></textarea>
+
+                <div class="flex justify-end mt-4">
+                    <button type="submit"
+                            class="bg-accent-dark text-white px-6 py-2 rounded-xl font-bold transition-all hover:bg-accent-hover active:scale-95">
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+
+        </div>
     </div>
 </div>
+
 
 
 <!-- JAVASCRIPT -->
@@ -346,23 +341,40 @@ if (!isset($_SESSION['user_id'])) {
 
         books.forEach(book => {
             //const coverUrl = book.book_cover || 'images/default-book-cover.png';
-            
+            const rating = parseFloat(book.avg_rating || 0).toFixed(1);
             const coverUrl = book.book_cover ? `/tekweb_project/${book.book_cover}` : '/tekweb_project/images/default-book-cover.png';
             console.log(book.book_cover);
 
             container.innerHTML += `
-                <div class="group bg-white rounded-2xl p-5 shadow
-                       transition-all duration-300 ease-out
-                       hover:-translate-y-2 hover:shadow-2xl
-                       active:scale-95 cursor-pointer"
-                    onclick="handleBookClick(${book.id})">
-                    <img src="${coverUrl}" alt="${book.title}"
-                        class="w-full h-64 object-cover rounded-xl mb-3" 
-                        onerror="this.src='/tekweb_project/images/default-book-cover.png'">
+                <div
+                class="group relative bg-white/70 backdrop-blur-sm
+                        rounded-[2rem] p-5 shadow
+                        transition-all duration-300 ease-out
+                        hover:-translate-y-2 hover:shadow-2xl
+                        active:scale-95 cursor-pointer"
+                data-book-id="${book.id}"
+                onclick="handleBookClick(${book.id})">
 
-                    <h3 class="font-bold text-lg">${book.title}</h3>
-                    <p class="text-sm text-gray-600 mt-1">${book.author}</p>
-                </div>`;
+                <!-- COVER -->
+                <img src="${coverUrl}" alt="${book.title}"
+                    class="w-full h-64 object-cover rounded-xl mb-3"
+                    onerror="this.src='/tekweb_project/images/default-book-cover.png'">
+
+                <!-- AVG RATING BADGE -->
+                <div class="absolute top-3 right-3 bg-white/95 backdrop-blur-md
+                            px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 z-10">
+                    <i class="fas fa-star text-yellow-400 text-xs"></i>
+                    <span class="text-xs font-bold text-[#2F3E46]">${rating}</span>
+                </div>
+
+                <!-- TITLE -->
+                <h3 class="font-bold text-lg">${book.title}</h3>
+                <p class="text-sm text-gray-600 mt-1">${book.author}</p>
+
+            
+                </div>
+                `;
+
         });
     }
 
@@ -476,6 +488,19 @@ if (!isset($_SESSION['user_id'])) {
 
 
    // ADD TO READING LIST
+
+   document.getElementById("btn-add-readinglist").addEventListener("click", async () => {
+    const modal = document.getElementById("details-modal");
+    const bookId = modal.dataset.bookId;
+
+    if (!bookId) {
+        console.warn("No bookId found in modal");
+        return;
+    }
+
+    await addToReadingList(bookId);
+});
+
 async function addToReadingList(bookId, title = "", author = "", status = "to_read") {
     try {
         const formData = new FormData();
@@ -510,7 +535,7 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
 }
 
 
-    function scrollToRating() {
+   function scrollToRating() {
         const modal = document.getElementById("details-modal");
         modal.classList.remove("hidden"); // ensure visible
 
@@ -553,26 +578,48 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
             document.getElementById("details-author").textContent = "By " + data.author;
 
             document.getElementById("details-rating").innerHTML =
-                `<i class="fas fa-star mr-1"></i> ${parseFloat(data.avg_rating).toFixed(1)} / 5.0`;
+            `<i class="fas fa-star mr-1"></i> ${parseFloat(data.avg_rating).toFixed(1)} / 5.0`;
 
 
             document.getElementById("details-synopsis").textContent =
-                data.synopsis?.trim() ? data.synopsis : "Synopsis not available.";
+                data.synopsis?.trim() ? data.synopsis : "No synopsis available for this book.";
 
             const reviewContainer = document.getElementById("details-reviews");
             reviewContainer.innerHTML = "";
 
             if (data.reviews.length === 0) {
-                reviewContainer.innerHTML = `<p class="text-gray-500">No reviews yet.</p>`;
+                reviewContainer.innerHTML = `<p class="text-gray-500">No reviews yet. Be the first!</p>`;
             } else {
                 data.reviews.forEach(r => {
-                    reviewContainer.innerHTML += `
-                        <div class="border p-3 rounded-lg">
-                            <p class="font-semibold">⭐ ${r.rating} — ${r.username}</p>
-                            <p class="text-gray-700">${r.review}</p>
-                            <p class="text-xs text-gray-500">${r.created_at}</p>
+                   reviewContainer.innerHTML += `
+                    <div class="bg-white/60 p-4 rounded-2xl border border-white/50 shadow-sm">
+                        
+                        <!-- USERNAME + RATING -->
+                        <div class="flex items-center gap-2 mb-1">
+                            <p class="font-semibold text-base text-[#2F3E46]">
+                                ${r.username}
+                            </p>
+                            <span class="inline-flex items-center gap-1
+                                        text-sm font-semibold
+                                        bg-yellow-100 text-yellow-700
+                                        px-2 py-0.5 rounded-md">
+                                <i class="fas fa-star text-[11px]"></i>
+                                ${r.rating}
+                            </span>
                         </div>
-                    `;
+
+                        <!-- REVIEW TEXT -->
+                        <p class="text-gray-700 text-sm leading-relaxed mb-1">
+                            ${r.review}
+                        </p>
+
+                        <!-- TIMESTAMP -->
+                        <p class="text-xs text-gray-500">
+                            ${r.created_at}
+                        </p>
+                    </div>
+                `;
+
                 });
             }
 
@@ -612,9 +659,26 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
 
     // USER CLICKS RATE -> SHOW FORM
     document.getElementById("btn-rate-book").addEventListener("click", () => {
-        document.getElementById("rating-form").classList.remove("hidden");
-        initHalfStarRating(); // show star rating
-    });
+    const ratingForm = document.getElementById("rating-form");
+    if (!ratingForm) return;
+
+    // 1. munculkan form
+    ratingForm.classList.remove("hidden");
+
+    // 2. init star (logic lama)
+    initHalfStarRating();
+
+    // 3. scroll modal content (BUKAN window)
+    const scrollContainer = ratingForm.closest(".overflow-y-auto");
+
+    if (scrollContainer) {
+        scrollContainer.scrollTo({
+            top: ratingForm.offsetTop - 24,
+            behavior: "smooth"
+        });
+    }
+});
+
 
     /* ----------------------------------------------------
     HALF STAR RATING (REUSABLE)
@@ -677,6 +741,63 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
 
         render(0);
     }
+    
+function prependNewReview(r) {
+    const container = document.getElementById("details-reviews");
+
+    // Hapus teks "No reviews yet"
+    if (container.querySelector("p.text-gray-500")) {
+        container.innerHTML = "";
+    }
+
+    const div = document.createElement("div");
+    div.className =
+        "bg-white/60 p-4 rounded-2xl border border-white/50 shadow-sm animate-fade-in";
+
+    div.innerHTML = `
+        <div class="flex items-center gap-2 mb-1">
+            <p class="font-semibold text-base text-[#2F3E46]">${r.username}</p>
+            <span class="inline-flex items-center gap-1
+                         text-sm font-semibold
+                         bg-yellow-100 text-yellow-700
+                         px-2 py-0.5 rounded-md">
+                <i class="fas fa-star text-[11px]"></i>
+                ${r.rating}
+            </span>
+        </div>
+        <p class="text-gray-700 text-sm leading-relaxed mb-1">
+            ${r.review}
+        </p>
+        <p class="text-xs text-gray-500">
+            ${r.created_at}
+        </p>
+    `;
+
+    container.prepend(div);
+}
+function updateModalAvgRating(avg) {
+    const badge = document.getElementById("details-rating");
+    badge.innerHTML = `
+        <i class="fas fa-star mr-1"></i> ${parseFloat(avg).toFixed(1)} / 5.0
+    `;
+}
+
+
+function updateBookCardRating(bookId, avg) {
+    // Update data source
+    const book = window.allBooks.find(b => b.id == bookId);
+    if (book) book.avg_rating = avg;
+
+    // Update UI badge
+    const card = document.querySelector(`[data-book-id="${bookId}"]`);
+    if (!card) return;
+
+    const badge = card.querySelector(".absolute.top-3.right-3 span");
+    if (badge) {
+        badge.textContent = parseFloat(avg).toFixed(1);
+    }
+}
+
 
     // SUBMITTING RATING / REVIEW
     document.getElementById("rating-form").addEventListener("submit", async (e) => {
@@ -706,11 +827,27 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
         }
 
         // After submit:
+        if (!data.success) {
+            alert(data.message || "Failed to submit review");
+            return;
+}
+
+        // 1. Tambah review ke UI
+        prependNewReview(data.new_review);
+
+        // 2. Update avg rating (modal)
+        updateModalAvgRating(data.new_avg_rating);
+
+        // 3. Update avg rating (book card di home)
+        updateBookCardRating(bookId, data.new_avg_rating);
+
+        // 4. Hide form & button
         document.getElementById("rating-form").classList.add("hidden");
         document.getElementById("btn-rate-book").classList.add("hidden");
 
-        // Reload modal content
-        openDetailsModal(bookId);
+        // 5. Reset form
+        document.getElementById("rating-form").reset();
+
     });
 
     // CLOSE MODAL BOOK DETAILS

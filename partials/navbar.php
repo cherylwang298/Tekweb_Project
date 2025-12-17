@@ -4,9 +4,12 @@ $currentPage = $_GET['page'] ?? 'home';
 ?>
 
 <header class="sticky top-0 z-50 w-full  backdrop-blur-lg border-b border-white/20">
+  <div class="pt-3">
   <div class="max-w-screen-xl mx-auto flex items-center py-4 px-6 sm:px-10">
 
-    <div class="font-serif text-3xl font-bold text-[#2F3E46] tracking-wide select-none">
+
+  
+    <div class="font-serif text-4xl font-bold text-[#2F3E46] tracking-wide select-none">
       Biblios
     </div>
 
@@ -38,8 +41,13 @@ $currentPage = $_GET['page'] ?? 'home';
             class="ml-auto p-2 text-2xl text-[#2F3E46] sm:hidden hover:bg-[#1D5C63]/5 rounded-lg transition-colors">
       <i class="fas fa-bars-staggered"></i>
     </button>
-  </div>
+    </div>
+
+  <!-- GARIS PEMISAH NAVBAR -->
+  <hr class="mt-3 border-0 h-[2px] bg-gradient-to-r from-transparent via-[#52796F]/40 to-transparent">
+
 </header>
+
 
 <div id="mobile-menu"
      class="hidden fixed inset-x-6 top-20 z-50 flex-col space-y-2 p-3 bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl border border-white/40 ring-1 ring-black/5">
