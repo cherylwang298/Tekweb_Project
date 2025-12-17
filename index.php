@@ -1,7 +1,33 @@
 <?php
 session_start();
-include 'koneksi.php';
-include 'navbar.php';
+
+$page = $_GET['page'] ?? 'home';
+
+if (!isset($_SESSION['user_id']) && !in_array($page, ['login', 'create-account'])) {
+    header("Location: index.php?page=login");
+    exit;
+}
+
+switch ($page) {
+    case 'login':
+        require "pages/auth/login.php";
+        break;
+
+    case 'create-account':
+        require "pages/auth/create-account.php";
+        break;
+
+    case 'home':
+        require "pages/home.php";
+        break;
+
+    case 'statistik':
+        require "pages/statistik.php";
+        break;
+
+    default:
+        require "pages/home.php";
+}
 
 ?>
 

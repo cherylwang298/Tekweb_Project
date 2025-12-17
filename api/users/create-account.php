@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'koneksi.php';
+require_once "../../config/koneksi.php";
 
 if (isset($_POST['register'])) {
 

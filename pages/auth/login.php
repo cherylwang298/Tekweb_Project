@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'koneksi.php';
+require_once "../../config/koneksi.php";
 
 if (isset($_POST['submit'])) {
   $username = trim($_POST['username']);
@@ -18,10 +18,11 @@ if (isset($_POST['submit'])) {
       $user = $result->fetch_assoc();
 
       if (password_verify($password, $user['password_hash'])) {
+        $_SESSION['user_id'] = (int)$user['id'];
         $_SESSION['username'] = $user['username'];
-        $_SESSION['name']     = $user['name'];
+        $_SESSION['name'] = $user['name'];
 
-        header("Location: index.php");
+        header("Location: ../../index.php?page=home");
         exit;
       } else {
         $error = "Password salah!";
@@ -223,7 +224,7 @@ if (isset($_POST['submit'])) {
       class="font-sans text-center mt-4 sm:mt-6
              text-sm sm:text-base text-[#2F3E46]">
       Don't have an account?
-      <a href="create-account.php"
+      <a href="../../index.php?page=create-account"
         class="text-[#52796F] font-semibold hover:underline">
         Create Account
       </a>
