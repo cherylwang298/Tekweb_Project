@@ -24,7 +24,7 @@ $book_cover = null;
 if (isset($_FILES['book_cover']) && $_FILES['book_cover']['error'] === 0) {
 
     // SERVER PATH (fisik)
-    $uploadDirServer = __DIR__ . "/../uploads/covers/";
+    $uploadDirServer = __DIR__ . "/../../uploads/covers/";
 
     // PATH UNTUK DATABASE & BROWSER
     $uploadDirDB = "/uploads/covers/";

@@ -129,9 +129,8 @@ if (!isset($_SESSION['user_id'])) {
 
           <button
             id="open-modal-btn"
-            class="bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-sm hover:bg-[#0E3C40] transition w-full sm:w-auto"
-          >
-            + Add New Book
+            >
+            
           </button>
         </div>
 
@@ -464,14 +463,14 @@ if (!isset($_SESSION['user_id'])) {
       const authorInput = document.getElementById("penulis");
       const dropdown = document.getElementById("title-dropdown");
 
-      // Mobile Menu Elements
-      const menuButton = document.getElementById("menu-button");
-      const mobileMenu = document.getElementById("mobile-menu");
+      // // Mobile Menu Elements
+      // const menuButton = document.getElementById("menu-button");
+      // const mobileMenu = document.getElementById("mobile-menu");
 
-      // Event listener untuk Mobile Menu (NEW)
-      menuButton.addEventListener("click", () => {
-        mobileMenu.classList.toggle("hidden");
-      });
+      // // Event listener untuk Mobile Menu (NEW)
+      // menuButton.addEventListener("click", () => {
+      //   mobileMenu.classList.toggle("hidden");
+      // });
 
       let currentFilter = "all";
       let bookIdToDelete = null;
@@ -594,13 +593,36 @@ if (!isset($_SESSION['user_id'])) {
   filteredBooks.forEach(book => {
     const statusClasses = getStatusClasses(book.status);
 
-    const cover = book.book_cover
-      ? `<img src="/tekweb_project/${book.book_cover}" class="w-full h-full object-cover"
-      onerror="this.src='/tekweb_project/images/default-book-cover.png'">`
-      : `<span class="text-sm text-gray-500">No Cover</span>`;
+//     let coverSrc = "";
+
+// if (!book.book_cover || book.book_cover.trim() === "") {
+//     coverSrc = "/tekweb_project/images/default-book-cover.png";
+// } else if (book.book_cover.startsWith("http")) {
+//     coverSrc = book.book_cover; // URL eksternal
+// } else if (book.book_cover.startsWith("/")) {
+//     coverSrc = "/tekweb_project" + book.book_cover; // path absolut
+// } else {
+//     coverSrc = "/tekweb_project/" + book.book_cover; // path relatif
+// }
+
+
+    // const cover = book.book_cover
+    //   ? `<img src="/tekweb_project/${coverPath}" class="w-full h-full object-cover"
+    //   onerror="this.src='/tekweb_project/images/default-book-cover.png'">`
+    //   : `<span class="text-sm text-gray-500">No Cover</span>`;
+
+    const coverSrc = getCoverSrc(book);
+
+    const cover = `<img src="${coverSrc}" class="w-full h-full object-cover"
+               onerror="this.src='/tekweb_project/images/default-book-cover.png'">`;
+
+    // const cover = `<img src="tekweb_project/${book.book_cover}" class="w-full h-full object-cover"
+    //             onerror="this.src='/tekweb_project/images/default-book-cover.png'">`;
+    
+               console.log("book: ", book.title, "Cover:", coverSrc);
 
     bookGrid.innerHTML += `
-      <div class="bg-white rounded-lg shadow-md p-5 flex flex-col">
+      <div class="bg-white rounded-lg shadow-md p-5 flex flex-col" onclick="openDetailsModal(${book.book_id})">
         <div class="text-xs font-semibold px-3 py-1 rounded-md w-fit ${statusClasses}">
           ${displayStatus(book.status)}
         </div>
@@ -630,19 +652,31 @@ if (!isset($_SESSION['user_id'])) {
             Delete
           </button>
 
-
-               <button 
-          data-book-id="${book.book_id}"
-          onclick="openDetailsModal(${book.book_id})" class="btn-rate-book bg-accent-dark text-white py-2 px-4 rounded-md font-semibold text-xs hover:bg-[#0E3C40] transition">
-                  Details
-                </button>
-
-
                 </div>
       </div>
     `;
   });
       }
+
+      function getCoverSrc(book) {
+    if (!book.book_cover || book.book_cover.trim() === "") {
+        return "/tekweb_project/images/default-book-cover.png";
+    }
+
+    // URL eksternal
+    if (book.book_cover.startsWith("http://") || book.book_cover.startsWith("https://")) {
+        return book.book_cover;
+    }
+
+    // Path absolut mulai dengan /
+    if (book.book_cover.startsWith("/")) {
+        return "/tekweb_project" + book.book_cover;
+    }
+
+    // Path relatif (../ atau langsung nama file)
+    // Encode URI untuk spasi/karakter aneh
+    return "/tekweb_project/" + encodeURI(book.book_cover);
+}
 
 
       // function openDetailsModal(id){
