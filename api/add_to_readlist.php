@@ -21,10 +21,8 @@ if ($status === '') {
   $status = 'to_read';
 }
 
-/* 1️⃣ Tentukan book_id */
 if ($selected_book_id) {
 
-  // 🔒 Validasi book_id benar-benar ada
   $stmt = $conn->prepare("SELECT id FROM books WHERE id = ?");
   $stmt->bind_param("i", $selected_book_id);
   $stmt->execute();
@@ -39,7 +37,6 @@ if ($selected_book_id) {
 
 } else {
 
-  // ❗ Manual input wajib title & author
   if ($title === '' || $author === '') {
     echo json_encode(["success" => false, "message" => "Title & author required"]);
     exit;
@@ -72,7 +69,6 @@ exit;
   }
 }
 
-/* 2️⃣ Cek duplikasi di reading list */
 $stmt = $conn->prepare("
   SELECT id FROM reading_lists
   WHERE user_id = ? AND book_id = ?
@@ -89,7 +85,6 @@ if ($stmt->num_rows > 0) {
   exit;
 }
 
-/* 3️⃣ Insert ke reading_lists */
 $stmt = $conn->prepare("
   INSERT INTO reading_lists (user_id, book_id, status)
   VALUES (?, ?, ?)

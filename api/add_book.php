@@ -1,5 +1,19 @@
 <?php
+session_start();
 require_once "db.php";
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+if(!isset($_SESSION['user_id'])) {
+    echo json_encode(["success" => false, "message" => "Unauthorized"]);
+    exit;
+}
+
+
+$user_id = $_SESSION['user_id'];
+
 
 // Input
 $title = $_POST['title'];
@@ -43,5 +57,12 @@ if ($check->num_rows > 0) {
 $stmt = $conn->prepare("INSERT INTO books (title, author, synopsis, book_cover) VALUES (?, ?, ?, ?)");
 $stmt->bind_param("ssss", $title, $author, $synopsis, $book_cover);
 $stmt->execute();
+
+$defaultStatus = "reading";
+$book_id = $conn->insert_id;
+
+$stmt2 = $conn->prepare("INSERT INTO reading_lists (user_id, book_id, status) VALUES (?, ?, ?)");
+$stmt2->bind_param("iis", $user_id, $book_id, $defaultStatus);
+$stmt2->execute();
 
 echo json_encode(["success" => true, "id" => $stmt->insert_id]);

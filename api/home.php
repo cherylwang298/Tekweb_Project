@@ -295,7 +295,8 @@ if (!isset($_SESSION['user_id'])) {
 
         const res = await fetch("add_book.php", {
             method: "POST",
-            body: form
+            body: form,
+            credentials: "same-origin"
         });
 
         return res.json();
