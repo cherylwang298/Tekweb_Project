@@ -265,10 +265,31 @@ tailwind.config = {
     </div>
 </div>
 
+<div id="toast" class="fixed opacity-0"></div>
 
 
 <!-- JAVASCRIPT -->
 <script>
+    function showToast(message, type = "error") {
+        const toast = document.getElementById("toast");
+        if (!toast) return;
+
+        toast.textContent = message;
+
+        toast.className = `fixed top-8 right-8 bg-accent-dark text-white px-6 py-4 rounded-2xl shadow-2xl
+         opacity-100 transition-opacity duration-300 z-50 ${
+            type === "error" ? "bg-red-500" : "bg-accent-dark"
+            }`;
+
+        setTimeout(() => {
+            toast.classList.remove("opacity-100");
+            toast.classList.add("opacity-0");
+        }, 2500);
+        }
+
+
+
+
     window.allBooks = [];
 
     const currentUserId = <?= (int)$_SESSION['user_id'] ?>;
@@ -469,12 +490,12 @@ tailwind.config = {
         const result = await res.json();
 
         if (!result.success) {
-            alert(result.message || "Failed to add book");
+            showToast(result.message || "Failed to add book", "error");
         } else {
             e.target.reset();
             document.getElementById('book-modal').classList.add('hidden');
             await loadHome();
-            alert("Book added successfully!");
+            showToast("Book added successfully!", "success");
         }
 
         submitBtn.disabled = false;
@@ -482,7 +503,7 @@ tailwind.config = {
 
     } catch (err) {
         console.error(err);
-        alert("An error occurred. Please try again.");
+        showToast("An error occurred. Please try again.", "error");
     }
 });
 
@@ -521,11 +542,11 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
         const data = await res.json();
 
         if (data.success) {
-            alert("Book added to your reading list!");
+            showToast("Book added to your reading list!", "success");
             // opsional: bisa update UI misal tombol disable atau teks berubah
         } else {
-            alert(data.message || "Failed to add to reading list");
-        }
+            showToast(data.message || "Failed to add to reading list", "error");
+            }
 
         openDetailsModal(bookId);
     } catch (err) {
@@ -558,7 +579,7 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
             
 
             if (data.error) {
-                alert(data.error);
+                showToast(data.error, "error");
                 return;
             }
 
@@ -631,7 +652,7 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
 
         } catch (err) {
             console.error(err);
-            alert("Could not load book details.");
+            showToast("Could not load book details.", "error");
         }
     }
 
@@ -822,13 +843,13 @@ function updateBookCardRating(bookId, avg) {
         const data = await res.json();
 
         if (!data.success) {
-            alert(data.message || "Failed to submit review");
+            showToast(data.message || "Failed to submit review", "error");
             return;
         }
 
         // After submit:
         if (!data.success) {
-            alert(data.message || "Failed to submit review");
+            showToast(data.message || "Failed to submit review", "error");
             return;
 }
 

@@ -224,7 +224,7 @@ if (isset($_POST['submit'])) {
       class="font-sans text-center mt-4 sm:mt-6
              text-sm sm:text-base text-[#2F3E46]">
       Don't have an account?
-      <a href="../../index.php?page=create-account"
+      <a href="/tekweb_project/pages/auth/create-account.php"
         class="text-[#52796F] font-semibold hover:underline">
         Create Account
       </a>

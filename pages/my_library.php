@@ -52,7 +52,6 @@ if (!isset($_SESSION['user_id'])) {
       };
     </script>
 
-     </script>
     <style>
         @keyframes blobMove1 { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -40px) scale(1.1); } 100% { transform: translate(0, 0) scale(1); } }
         @keyframes blobMove2 { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-50px, 30px) scale(1.05); } 100% { transform: translate(0, 0) scale(1); } }
@@ -271,9 +270,7 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
 
-    <div id="toast" class="fixed top-5 right-5 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50">
-  <!-- notif gabisa add soalnya ga ada di db -->
-</div>
+    
 
       
       <div id="edit-status-modal"
@@ -525,10 +522,19 @@ if (!isset($_SESSION['user_id'])) {
             class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md font-semibold hover:bg-gray-400 transition"
           >
             Cancel
-          </button>
+          </button> 
         </div>
       </div>
     </div>
+
+    <div id="toast"
+     class="fixed top-8 right-8 z-[9999]
+            hidden
+            px-6 py-4 rounded-2xl shadow-2xl
+            text-white font-semibold
+            transition-opacity duration-300">
+</div>
+
 
   </body>
 </html>
@@ -569,21 +575,28 @@ if (!isset($_SESSION['user_id'])) {
       
       let bookIdToDelete = null;
 
-      function showToast(message, type = "error") {
+      function showToast(message, type = "success") {
   const toast = document.getElementById("toast");
+  if (!toast) return;
+
   toast.textContent = message;
 
-  // ganti warna background sesuai type
-  toast.className = `fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg opacity-100 transition-opacity duration-300 z-50 ${
-    type === "error" ? "bg-red-500" : "bg-green-500"
-  }`;
+  toast.classList.remove("hidden", "opacity-0");
+  toast.classList.add(
+    "opacity-100",
+    type === "error" ? "bg-red-500" : "bg-accent-dark"
+  );
 
-  // hide otomatis setelah 2.5 detik
   setTimeout(() => {
     toast.classList.remove("opacity-100");
     toast.classList.add("opacity-0");
   }, 2500);
+
+  setTimeout(() => {
+    toast.classList.add("hidden");
+  }, 3000);
 }
+
 
   // load user rating
 
@@ -848,7 +861,8 @@ if (!isset($_SESSION['user_id'])) {
               modal.classList.remove("hidden");
         } catch (error) {
           console.error(error);
-          alert("Failed to load book details")
+          showToast("Failed to load book details", "error");
+
         }
       }
 
@@ -886,7 +900,7 @@ if (!isset($_SESSION['user_id'])) {
         const data = await res.json();
 
         if (!data.success) {
-            alert(data.message || "Failed to submit review");
+            showToast(data.message || "Failed to submit review", "error");
             return;
         }
 
@@ -937,8 +951,7 @@ if (!isset($_SESSION['user_id'])) {
   const result = await res.json();
 
   if (!result.success) {
-    alert(result.message || "Failed to save book");
-    showToast(result.message, "error")
+    showToast(result.message || "Failed to save book", "error");
     return;
   }
 
@@ -959,7 +972,7 @@ editForm.addEventListener("submit", async function(e) {
 
   const result = await res.json();
   if (!result.success) {
-    alert(result.message || "Failed to update book");
+    showToast(result.message || "Failed to update book", "error");
     return;
   }
 
