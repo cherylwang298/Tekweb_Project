@@ -276,7 +276,7 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
 
-    <div id="toast" class="fixed top-5 right-5 z-[1000] pointer-events-none bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50">
+    <div id="toast" class="fixed top-8 right-8 bg-accent-dark text-white px-6 py-4 rounded-2xl shadow-2xl hidden z-[200] animate-fade-in">
   <!-- notif gabisa add soalnya ga ada di db -->
 </div>
 
@@ -502,7 +502,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <div 
   id="delete-modal" 
-  class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
+  class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 top-[-10rem] md:top-0"
 >
   <div class="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] p-6 max-w-sm w-full text-center border border-white/50 shadow-2xl">
     
@@ -562,76 +562,43 @@ if (!isset($_SESSION['user_id'])) {
       const titleInput = document.getElementById("judul");
       const authorInput = document.getElementById("penulis");
       const dropdown = document.getElementById("title-dropdown");
-
-      // // Mobile Menu Elements
-      // const menuButton = document.getElementById("menu-button");
-      // const mobileMenu = document.getElementById("mobile-menu");
-
-      // // Event listener untuk Mobile Menu (NEW)
-      // menuButton.addEventListener("click", () => {
-      //   mobileMenu.classList.toggle("hidden");
-      // });
-
       
       let bookIdToDelete = null;
 
-      function showToast(message, type = "error") {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
+  function showToast(message, type = "error") {
+          const toast = document.getElementById("toast");
+          if (!toast) return;
 
-  // ganti warna background sesuai type
-  toast.className = `fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg opacity-100 transition-opacity duration-300 z-50 ${
-    type === "error" ? "bg-red-500" : "bg-green-500"
-  }`;
+          toast.textContent = message;
 
-  // hide otomatis setelah 2.5 detik
-  setTimeout(() => {
-    toast.classList.remove("opacity-100");
-    toast.classList.add("opacity-0");
-  }, 2500);
-}
+          toast.className = `fixed top-8 right-8 bg-accent-dark text-white px-6 py-4 rounded-2xl shadow-2xl hidden z-[200] animate-fade-in ${
+              type === "error" ? "bg-red-500" : "bg-accent-dark"
+              }`;
+              toast.classList.remove("hidden");
+          setTimeout(() => {
+              toast.classList.add("hidden");
+          }, 2500);
+          }
 
+    function showReviewToast(message, type = "success") {
+    const toast = document.createElement("div");
 
-//     function showReviewToast(message, type = "success") {
-//   const toast = document.getElementById("review-toast");
-//   toast.textContent = message;
+    toast.className = `fixed top-8 right-8 bg-accent-dark text-white px-6 py-4 rounded-2xl shadow-2xl  z-[200] animate-fade-in ${type === "success" ? "bg-accent-dark" : "bg-red-500"}`;
 
-//   // ganti warna background sesuai type
-//   toast.className = `fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg opacity-100 transition-opacity duration-300 z-50 ${
-//     type === "success" ? "bg-green-500" : "bg-red-500"
-//   }`;
+    toast.textContent = message;
+    toast.style.zIndex = "2147483647";
+    toast.style.backdropFilter = "none";
+    toast.style.filter = "none";
 
-//   // hide otomatis setelah 2.5 detik
-//   setTimeout(() => {
-//     toast.classList.remove("opacity-100");
-//     toast.classList.add("opacity-0");
-//   }, 2500);
-// }
+    document.body.appendChild(toast);
 
-  function showReviewToast(message, type = "success") {
-  const toast = document.createElement("div");
+    setTimeout(() => {
+      toast.remove();
+    }, 2500);
+  }
 
-  toast.className = `fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 ${type === "error" ? "bg-red-500" : "bg-green-500"}`;
-
-  toast.textContent = message;
-  toast.style.zIndex = "2147483647";
-  toast.style.backdropFilter = "none";
-  toast.style.filter = "none";
-
-  document.body.appendChild(toast);
-
-  requestAnimationFrame(() => {
-    toast.style.opacity = "1";
-  });
-
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    setTimeout(() => toast.remove(), 300);
-  }, 2500);
-}
 
   // load user rating
-
   async function loadUserRating(bookId) {
     const res = await fetch(`/tekweb_project/api/users/get_user_rating.php?book_id=${bookId}&user_id=${currentUserId}`);
     const data = await res.json();
@@ -652,9 +619,6 @@ if (!isset($_SESSION['user_id'])) {
     ratingForm.classList.add("hidden");
   }
 
-
-
-      // --- Utility Functions ---
      async function getBooks() {
        const res = await fetch("/tekweb_project/api/reading_list/get_reading_lists.php");
 
@@ -710,7 +674,6 @@ if (!isset($_SESSION['user_id'])) {
           : decodeURIComponent(results[1].replace(/\+/g, " "));
       }
 
-      // --- CRUD READ & Filter ---
       async function renderBooks() {
        const allBooks = await getBooks();
 
@@ -732,31 +695,10 @@ if (!isset($_SESSION['user_id'])) {
   filteredBooks.forEach(book => {
     const statusClasses = getStatusClasses(book.status);
 
-//     let coverSrc = "";
-
-// if (!book.book_cover || book.book_cover.trim() === "") {
-//     coverSrc = "/tekweb_project/images/default-book-cover.png";
-// } else if (book.book_cover.startsWith("http")) {
-//     coverSrc = book.book_cover; // URL eksternal
-// } else if (book.book_cover.startsWith("/")) {
-//     coverSrc = "/tekweb_project" + book.book_cover; // path absolut
-// } else {
-//     coverSrc = "/tekweb_project/" + book.book_cover; // path relatif
-// }
-
-
-    // const cover = book.book_cover
-    //   ? `<img src="/tekweb_project/${coverPath}" class="w-full h-full object-cover"
-    //   onerror="this.src='/tekweb_project/images/default-book-cover.png'">`
-    //   : `<span class="text-sm text-gray-500">No Cover</span>`;
-
     const coverSrc = getCoverSrc(book);
 
     const cover = `<img src="${coverSrc}" class="w-full h-full object-cover"
                onerror="this.src='/tekweb_project/images/default-book-cover.png'">`;
-
-    // const cover = `<img src="tekweb_project/${book.book_cover}" class="w-full h-full object-cover"
-    //             onerror="this.src='/tekweb_project/images/default-book-cover.png'">`;
     
                console.log("book: ", book.title, "Cover:", coverSrc);
 
@@ -814,29 +756,17 @@ if (!isset($_SESSION['user_id'])) {
         return "/tekweb_project/images/default-book-cover.png";
     }
 
-    // URL eksternal
     if (book.book_cover.startsWith("http://") || book.book_cover.startsWith("https://")) {
         return book.book_cover;
     }
 
-    // Path absolut mulai dengan /
     if (book.book_cover.startsWith("/")) {
         return "/tekweb_project" + book.book_cover;
     }
 
-    // Path relatif (../ atau langsung nama file)
-    // Encode URI untuk spasi/karakter aneh
     return "/tekweb_project/" + encodeURI(book.book_cover);
 }
 
-
-      // function openDetailsModal(id){
-      //  const modal = document.getElementById("details-modal");
-      //   modal.dataset.bookId = id;
-      //   modal.classList.remove("hidden");
-
-      //   loadUserRating(id);
-      // }
 
       async function openDetailsModal(id){
         const modal = document.getElementById("details-modal");
@@ -851,8 +781,6 @@ if (!isset($_SESSION['user_id'])) {
           
           const data = JSON.parse(text);
 
-          // document.getElementById("details-cover").src =
-          //   data.book_cover || "images/default-book-cover.png";
 
           const coverImg = document.getElementById("details-cover");
             coverImg.src = data.book_cover ? `/tekweb_project/${data.book_cover}` : "/tekweb_project/images/default-book-cover.png";
@@ -949,26 +877,6 @@ if (!isset($_SESSION['user_id'])) {
 
       // end
 
-
-
-      //disuru komen
-
-      // bookGrid.addEventListener("click", (e)=> {
-      //   const btn = e.target.closest(".btn-rate-book");
-      //   if(!btn) return;
-
-      //   const bookId = btn.dataset.bookId;
-
-      //   const modal = document.getElementById("details-modal");
-      //   modal.dataset.bookId = bookId;
-      //   modal.classList.remove("hidden");
-
-      //     loadUserRating(bookId);
-      //   }
-      // )
-
-      // // --- CRUD CREATE
-//craye
   form.addEventListener("submit", async function (e) {
   e.preventDefault();
 
@@ -1011,11 +919,11 @@ editForm.addEventListener("submit", async function(e) {
     return;
   }
 
+  showReviewToast("Status updated successfully!", "success")
   closeModal(editStatusModal);
   renderBooks();
 });
 
-      // --- CRUD DELETE (Menggunakan Modal) ---
   async function deleteBook(id) {
   const res = await fetch("/tekweb_project/api/reading_list/deleteBook_readingList.php", {
     method: "POST",
@@ -1107,13 +1015,12 @@ document.addEventListener("DOMContentLoaded", () => {
     //form.reset();
   }
 
-  // CLOSE MODAL VIA X BUTTON
+ 
 document.getElementById("close-details").addEventListener("click", () => {
     document.getElementById("details-modal").classList.add("hidden");
     document.body.classList.remove("overflow-hidden");
 });
 
-// CLOSE MODAL WHEN CLICKING OUTSIDE CONTENT
 document.getElementById("details-modal").addEventListener("click", (e) => {
     if (e.target.id === "details-modal") {
         e.currentTarget.classList.add("hidden");
@@ -1237,7 +1144,6 @@ document.getElementById("details-modal").addEventListener("click", (e) => {
 
       // Inisialisasi: Tampilkan semua buku saat halaman dimuat
       document.addEventListener("DOMContentLoaded", () => {
-        // NEW LOGIC: Cek filter dari URL
         const filterFromUrl = getUrlParameter("filter");
 
         if (filterFromUrl) {

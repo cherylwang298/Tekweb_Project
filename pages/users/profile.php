@@ -161,7 +161,7 @@ if (isset($_POST['change_password'])) {
         </div>
     </div>
 
-    <div id="passwordModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+    <div id="passwordModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-[100] p-4 top-[-10rem] md:top-0">
         <div class="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] p-8 sm:p-10 max-w-md w-full border border-white/50 shadow-2xl animate-fade-in">
             <div class="mb-6">
                 
@@ -207,7 +207,7 @@ if (isset($_POST['change_password'])) {
     </div>
 </div> -->
 
-    <div id="logoutModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-[100] p-4">
+    <div id="logoutModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-[100] p-4 top-[-10rem] md:top-0">
   <div class="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] p-6 max-w-sm w-full text-center border border-white/50 shadow-2xl">
 
     <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-xl mx-auto mb-4">
