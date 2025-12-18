@@ -52,6 +52,7 @@ if (!isset($_SESSION['user_id'])) {
       };
     </script>
 
+     </script>
     <style>
         @keyframes blobMove1 { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -40px) scale(1.1); } 100% { transform: translate(0, 0) scale(1); } }
         @keyframes blobMove2 { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-50px, 30px) scale(1.05); } 100% { transform: translate(0, 0) scale(1); } }
@@ -94,6 +95,11 @@ if (!isset($_SESSION['user_id'])) {
             color: #facc15;
             display: none;
         }
+
+        #review-toast{
+          backdrop-filter: none !important;
+          filter: none !important;
+        }
     </style>
 
     <link
@@ -104,6 +110,7 @@ if (!isset($_SESSION['user_id'])) {
   
 <body class="bg-primary-bg font-sans text-text-dark min-h-screen relative overflow-x-hidden">
 
+
 <!-- BACKGROUND BLOBS -->
 <div class="fixed top-0 left-0 w-80 h-80 bg-[#B7D1C3] rounded-full blur-3xl opacity-40 -z-10"
      style="animation: blobMove1 20s ease-in-out infinite;"></div>
@@ -113,7 +120,6 @@ if (!isset($_SESSION['user_id'])) {
      style="animation: blobMove3 18s ease-in-out infinite;"></div>
 
 <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
       
 
       <hr class="border-t border-light-gray mb-6 mt-0 sm:mt-0" />
@@ -270,8 +276,13 @@ if (!isset($_SESSION['user_id'])) {
       </div>
     </div>
 
-    
+    <div id="toast" class="fixed top-5 right-5 z-[1000] pointer-events-none bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50">
+  <!-- notif gabisa add soalnya ga ada di db -->
+</div>
 
+
+    <!-- <div id="review-toast" class = "fixed top-5 right-5 z-[9999] pointer-events-none bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300">
+      </div> -->
       
       <div id="edit-status-modal"
     class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 top-[-15rem] md:top-0">
@@ -489,52 +500,41 @@ if (!isset($_SESSION['user_id'])) {
 </div>
 
 
-    <div
-      id="delete-modal"
-      class="hidden fixed inset-0 z-20 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4 top-[-15rem] md:top-0"
-    >
-      <div
-        class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-sm text-center transform duration-300"
-      >
-        <h3
-          class="font-serif text-xl sm:text-2xl text-red-600 mb-4 border-b border-light-gray pb-2"
-        >
-          Confirm Deletion
-        </h3>
-
-        <p class="mb-6 text-gray-700 text-sm sm:text-base">
-          Are you sure you want to permanently delete the book "<strong
-            id="book-title-to-delete"
-            class="font-semibold italic text-lg text-text-dark"
-          ></strong
-          >"?
-        </p>
-
-        <div class="flex justify-center space-x-4">
-          <button
-            id="confirm-delete-btn"
-            class="bg-red-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-red-700 transition"
-          >
-            Yes, Delete
-          </button>
-          <button
-            id="cancel-delete-btn"
-            class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md font-semibold hover:bg-gray-400 transition"
-          >
-            Cancel
-          </button> 
-        </div>
-      </div>
+    <div 
+  id="delete-modal" 
+  class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
+>
+  <div class="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] p-6 max-w-sm w-full text-center border border-white/50 shadow-2xl">
+    
+    <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-xl mx-auto mb-4">
+      <i class="fas fa-trash-alt"></i>
     </div>
 
-    <div id="toast"
-     class="fixed top-8 right-8 z-[9999]
-            hidden
-            px-6 py-4 rounded-2xl shadow-2xl
-            text-white font-semibold
-            transition-opacity duration-300">
-</div>
+    <h3 class="text-lg font-bold mb-1">Confirm Deletion</h3>
+    
+    <p class="text-gray-500 text-sm mb-6">
+      Are you sure you want to permanently delete 
+      <strong id="book-title-to-delete" class="font-bold text-gray-800 italic"></strong>?
+    </p>
 
+    <div class="flex gap-2">
+      <button 
+        id="cancel-delete-btn" 
+        class="flex-1 py-2.5 rounded-xl font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+      >
+        Cancel
+      </button>
+      
+      <button 
+        id="confirm-delete-btn" 
+        class="flex-1 py-2.5 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 transition-colors"
+      >
+        Yes, Delete
+      </button>
+    </div>
+
+  </div>
+</div>
 
   </body>
 </html>
@@ -575,28 +575,60 @@ if (!isset($_SESSION['user_id'])) {
       
       let bookIdToDelete = null;
 
-      function showToast(message, type = "success") {
+      function showToast(message, type = "error") {
   const toast = document.getElementById("toast");
-  if (!toast) return;
-
   toast.textContent = message;
 
-  toast.classList.remove("hidden", "opacity-0");
-  toast.classList.add(
-    "opacity-100",
-    type === "error" ? "bg-red-500" : "bg-accent-dark"
-  );
+  // ganti warna background sesuai type
+  toast.className = `fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg opacity-100 transition-opacity duration-300 z-50 ${
+    type === "error" ? "bg-red-500" : "bg-green-500"
+  }`;
 
+  // hide otomatis setelah 2.5 detik
   setTimeout(() => {
     toast.classList.remove("opacity-100");
     toast.classList.add("opacity-0");
   }, 2500);
-
-  setTimeout(() => {
-    toast.classList.add("hidden");
-  }, 3000);
 }
 
+
+//     function showReviewToast(message, type = "success") {
+//   const toast = document.getElementById("review-toast");
+//   toast.textContent = message;
+
+//   // ganti warna background sesuai type
+//   toast.className = `fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg opacity-100 transition-opacity duration-300 z-50 ${
+//     type === "success" ? "bg-green-500" : "bg-red-500"
+//   }`;
+
+//   // hide otomatis setelah 2.5 detik
+//   setTimeout(() => {
+//     toast.classList.remove("opacity-100");
+//     toast.classList.add("opacity-0");
+//   }, 2500);
+// }
+
+  function showReviewToast(message, type = "success") {
+  const toast = document.createElement("div");
+
+  toast.className = `fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 ${type === "error" ? "bg-red-500" : "bg-green-500"}`;
+
+  toast.textContent = message;
+  toast.style.zIndex = "2147483647";
+  toast.style.backdropFilter = "none";
+  toast.style.filter = "none";
+
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.style.opacity = "1";
+  });
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+}
 
   // load user rating
 
@@ -861,8 +893,7 @@ if (!isset($_SESSION['user_id'])) {
               modal.classList.remove("hidden");
         } catch (error) {
           console.error(error);
-          showToast("Failed to load book details", "error");
-
+          alert("Failed to load book details")
         }
       }
 
@@ -900,7 +931,8 @@ if (!isset($_SESSION['user_id'])) {
         const data = await res.json();
 
         if (!data.success) {
-            showToast(data.message || "Failed to submit review", "error");
+            //alert(data.message || "Failed to submit review");
+            showToast("Failed to submit review", "error");
             return;
         }
 
@@ -908,6 +940,8 @@ if (!isset($_SESSION['user_id'])) {
         document.getElementById("rating-form").classList.add("hidden");
         document.getElementById("btn-rate-modal").classList.add("hidden");
         //document.getElementById("btn-rate-book").classList.add("hidden");
+
+        showReviewToast("Review submitted successfully!", "success");
 
         // Reload modal content
         openDetailsModal(bookId);
@@ -951,7 +985,8 @@ if (!isset($_SESSION['user_id'])) {
   const result = await res.json();
 
   if (!result.success) {
-    showToast(result.message || "Failed to save book", "error");
+    alert(result.message || "Failed to save book");
+    showToast(result.message, "error")
     return;
   }
 
@@ -972,7 +1007,7 @@ editForm.addEventListener("submit", async function(e) {
 
   const result = await res.json();
   if (!result.success) {
-    showToast(result.message || "Failed to update book", "error");
+    alert(result.message || "Failed to update book");
     return;
   }
 
@@ -1326,8 +1361,6 @@ document.addEventListener("keydown", (e) => {
     document.querySelectorAll('[id$="modal"]').forEach(m => closeModal(m));
   }
 });
-
-
 
 
     </script>

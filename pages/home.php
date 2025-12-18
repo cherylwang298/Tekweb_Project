@@ -508,6 +508,56 @@ tailwind.config = {
 });
 
 
+   // ADD BOOKS FORM
+    document.getElementById('book-form').addEventListener('submit', async e => {
+        e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", document.getElementById('title-input').value.trim());
+    formData.append("author", document.getElementById('author-input').value.trim());
+    formData.append("synopsis", document.getElementById('synopsis-input').value.trim());
+
+    const coverInput = document.getElementById("cover-input");
+    if (coverInput.files.length > 0) {
+        formData.append("book_cover", coverInput.files[0]);
+    }
+
+    try {
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Adding...';
+
+        const res = await fetch("/tekweb_project/api/books/add_book.php", {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin"
+        });
+
+        const result = await res.json();
+
+        if (!result.success) {
+            //alert(result.message || "Failed to add book");
+            showToast("Failed to add book", "error")
+        } else {
+            e.target.reset();
+            document.getElementById('book-modal').classList.add('hidden');
+            await loadHome();
+            //alert("Book added successfully!");
+            showToast("Book added successfully!", "success")
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+
+    } catch (err) {
+        console.error(err);
+        //alert("An error occurred. Please try again.");
+        showToast("An error occurred. Please try again.", "error");
+    }
+});
+
+
    // ADD TO READING LIST
 
    document.getElementById("btn-add-readinglist").addEventListener("click", async () => {
@@ -542,11 +592,13 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
         const data = await res.json();
 
         if (data.success) {
-            showToast("Book added to your reading list!", "success");
+            //alert("Book added to your reading list!");
             // opsional: bisa update UI misal tombol disable atau teks berubah
+            showReviewToast("Book added to your reading list!", "succss");
         } else {
-            showToast(data.message || "Failed to add to reading list", "error");
-            }
+            //alert(data.message || "Failed to add to reading list");
+            showToast("Failed to add to reading list.", "error");
+        }
 
         openDetailsModal(bookId);
     } catch (err) {
@@ -579,8 +631,9 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
             
 
             if (data.error) {
-                showToast(data.error, "error");
-                return;
+               // alert(data.error);
+               showToast(data.error, "error"); 
+               return;
             }
 
             
@@ -652,7 +705,7 @@ async function addToReadingList(bookId, title = "", author = "", status = "to_re
 
         } catch (err) {
             console.error(err);
-            showToast("Could not load book details.", "error");
+            alert("Could not load book details.");
         }
     }
 
@@ -820,6 +873,30 @@ function updateBookCardRating(bookId, avg) {
 }
 
 
+    function showReviewToast(message, type = "success") {
+  const toast = document.createElement("div");
+
+  toast.className = `fixed top-8 right-8 bg-accent-dark text-white px-4 py-2 rounded-lg shadow-lg opacity-0  transition-opacity duration-300 ${type === "error" ? "bg-red-500" : "bg-accent-dark"}`;
+
+  toast.textContent = message;
+  toast.style.zIndex = "2147483647";
+  toast.style.backdropFilter = "none";
+  toast.style.filter = "none";
+
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.style.opacity = "1";
+  });
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+}
+
+
+
     // SUBMITTING RATING / REVIEW
     document.getElementById("rating-form").addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -843,31 +920,44 @@ function updateBookCardRating(bookId, avg) {
         const data = await res.json();
 
         if (!data.success) {
-            showToast(data.message || "Failed to submit review", "error");
+           // alert(data.message || "Failed to submit review");
+           showToast("Failed to submit review", "error");
             return;
         }
 
-        // After submit:
-        if (!data.success) {
-            showToast(data.message || "Failed to submit review", "error");
-            return;
-}
+//         // After submit:
+//         if (data.success) {
+//             //alert(data.message || "Failed to submit review");
+//             showToast("Review submitted successfully!", "success");
+//             return;
+// }
 
-        // 1. Tambah review ke UI
-        prependNewReview(data.new_review);
+        // // 1. Tambah review ke UI
+        // prependNewReview(data.new_review);
 
-        // 2. Update avg rating (modal)
-        updateModalAvgRating(data.new_avg_rating);
+        // // 2. Update avg rating (modal)
+        // updateModalAvgRating(data.new_avg_rating);
 
-        // 3. Update avg rating (book card di home)
-        updateBookCardRating(bookId, data.new_avg_rating);
+        // // 3. Update avg rating (book card di home)
+        // updateBookCardRating(bookId, data.new_avg_rating);
 
-        // 4. Hide form & button
+        // // 4. Hide form & button
+        // document.getElementById("rating-form").classList.add("hidden");
+        // document.getElementById("btn-rate-book").classList.add("hidden");
+
+        // // 5. Reset form
+        // document.getElementById("rating-form").reset();
+
+        // showToast("Review submitted successfully!", "success");
+
+         // After submit:
         document.getElementById("rating-form").classList.add("hidden");
         document.getElementById("btn-rate-book").classList.add("hidden");
+        //document.getElementById("btn-rate-book").classList.add("hidden");
 
-        // 5. Reset form
-        document.getElementById("rating-form").reset();
+        showReviewToast("Review submitted successfully!", "success");
+
+        openDetailsModal(bookId);
 
     });
 
