@@ -23,7 +23,6 @@ if (!isset($_SESSION['user_id'])) {
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
-
     <script>
       tailwind.config = {
         theme: {
@@ -33,6 +32,7 @@ if (!isset($_SESSION['user_id'])) {
                 'accent-dark': '#52796F',
                'text-dark': '#2F3E46',
                 'light-gray': '#E4E1D8',
+                 'accent-hover': '#354F52',
 
 
               
@@ -51,6 +51,15 @@ if (!isset($_SESSION['user_id'])) {
         },
       };
     </script>
+
+     </script>
+    <style>
+        @keyframes blobMove1 { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -40px) scale(1.1); } 100% { transform: translate(0, 0) scale(1); } }
+        @keyframes blobMove2 { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-50px, 30px) scale(1.05); } 100% { transform: translate(0, 0) scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.4); }
+    </style>
 
 
 <style>
@@ -268,7 +277,7 @@ if (!isset($_SESSION['user_id'])) {
 
       
       <div id="edit-status-modal"
-    class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4">
+    class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 top-[-15rem] md:top-0">
 
     <!-- BACKDROP -->
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
@@ -285,7 +294,8 @@ if (!isset($_SESSION['user_id'])) {
         <span class="close-btn
             absolute right-6 top-6
             text-gray-400 hover:text-gray-900
-            text-3xl cursor-pointer z-10">
+            text-3xl cursor-pointer z-10"
+            onclick="closeModal(document.getElementById('edit-status-modal'))">
             &times;
         </span>
 
@@ -352,12 +362,10 @@ if (!isset($_SESSION['user_id'])) {
                     </select>
                 </div>
 
-                <div class="flex justify-end">
+                <div class="flex justify-center">
                     <button
                         type="submit"
-                        class="bg-accent-dark text-white
-                               px-6 py-2 rounded-xl font-bold
-                               transition-all hover:bg-accent-hover active:scale-95">
+                        class="py-3 px-8 bg-accent-dark text-white rounded-2xl font-bold text-sm hover:bg-accent-hover transition-all shadow-md active:scale-95">
                         Update
                     </button>
                 </div>
@@ -376,8 +384,8 @@ if (!isset($_SESSION['user_id'])) {
     <div
         class="bg-white/90 backdrop-blur-xl
                rounded-[2.5rem] shadow-2xl
-               w-full max-w-3xl max-h-[85vh] overflow-y-auto
-               relative border border-white/40">
+               w-full max-w-3xl h-[60vh] sm:h-auto max-h-[60vh] sm:max-h-[80vh] overflow-y-auto
+               relative border border-white/40 top-[-8rem] sm:top-[-8rem] md:top-0">
 
         <!-- CLOSE -->
         <span id="close-details" class="absolute right-6 top-3 text-gray-600 hover:text-gray-900 text-3xl cursor-pointer font-light" 
@@ -486,7 +494,7 @@ if (!isset($_SESSION['user_id'])) {
 
     <div
       id="delete-modal"
-      class="hidden fixed inset-0 z-20 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4"
+      class="hidden fixed inset-0 z-20 overflow-auto bg-black bg-opacity-40 flex items-center justify-center p-4 top-[-15rem] md:top-0"
     >
       <div
         class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-sm text-center transform duration-300"
